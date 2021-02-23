@@ -1,0 +1,20 @@
+{
+    "name": "chiswill/ep-swoole",
+    "description": "Swoole Extension for EP",
+    "type": "library",
+    "license": "MIT",
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=7.4",
+        "ext-swoole": "*",
+        "chiswill/ep": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Ep\\Swoole\\": "src"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    }
+}
