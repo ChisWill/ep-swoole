@@ -9,9 +9,18 @@
         "ext-swoole": "*",
         "chiswill/ep": "*"
     },
+    "require-dev": {
+        "swoole/ide-helper": "~4.5.10"
+    },
     "autoload": {
         "psr-4": {
             "Ep\\Swoole\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Ep\\Tests\\": "tests",
+            "Ep\\Tests\\App\\": "tests/App/src"
         }
     },
     "config": {
