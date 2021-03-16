@@ -10,10 +10,8 @@ return [
     'mysqlPassword' => '',
     'env' => 'test',
     'debug' => true,
-    'secretKey' => '8FFA893E119A32D0C6A686863217A181',
-    'errorHandler' => 'index/error',
+    'secretKey' => '8FA893E11FWE2340C6A68663217A181',
     'route' => require('route.php'),
     'events' => require('events.php'),
-    'params' => require('params.php'),
-    'definitions' => require('definitions.php')
+    'params' => require('params.php')
 ];

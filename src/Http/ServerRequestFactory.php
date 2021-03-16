@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ep\Swoole\Http;
 
+use Ep\Web\ServerRequest;
 use Swoole\Http\Request;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamFactoryInterface;
@@ -13,7 +14,7 @@ use Psr\Http\Message\UriFactoryInterface;
 use Psr\Http\Message\UriInterface;
 use RuntimeException;
 
-final class ServerRequest implements ServerRequestInterface
+final class ServerRequestFactory implements ServerRequestInterface
 {
     private Request $request;
 
@@ -45,7 +46,7 @@ final class ServerRequest implements ServerRequestInterface
         $this->streamFactory = $streamFactory;
     }
 
-    public function create(Request $request): self
+    public function create(Request $request): ServerRequest
     {
         $new = clone $this;
 
@@ -56,7 +57,7 @@ final class ServerRequest implements ServerRequestInterface
         $new->uri = $new->initUri();
         $new->stream = $new->initStream();
 
-        return $new;
+        return new ServerRequest($new);
     }
 
     /**
@@ -302,12 +303,20 @@ final class ServerRequest implements ServerRequestInterface
         return $new;
     }
 
+    private ?array $headers = null;
+
     /**
      * {@inheritDoc}
      */
     public function getHeaders(): array
     {
-        return $this->request->header ?: [];
+        if ($this->headers === null) {
+            $this->headers = [];
+            foreach ($this->request->header as $key => $value) {
+                $this->headers[$key] = (array) $value;
+            }
+        }
+        return $this->headers;
     }
 
     /**

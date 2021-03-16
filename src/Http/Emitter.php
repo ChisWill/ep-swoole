@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Ep\Swoole\Http;
 
-use Swoole\Http\Response;
 use Yiisoft\Http\Status;
+use Swoole\Http\Response;
 use Psr\Http\Message\ResponseInterface;
 
 final class Emitter

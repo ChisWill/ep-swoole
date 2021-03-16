@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace Ep\Swoole\Http;
 
-use Closure;
-use Ep\Swoole\Config;
+use Ep\Contract\ErrorRendererInterface;
 use Ep\Swoole\Contract\ServerInterface;
 use Ep\Swoole\Contract\ServerTrait;
 use Ep\Swoole\Http\Emitter;
-use Ep\Swoole\Http\ServerRequest;
 use Ep\Swoole\SwooleEvent;
 use Ep\Web\Application as WebApplication;
-use Ep\Web\ErrorHandler;
 use Ep\Web\Service;
 use Yiisoft\Http\Method;
 use Swoole\Http\Request;
@@ -27,19 +24,19 @@ class Server implements ServerInterface
     use ServerTrait;
 
     private WebApplication $webApplication;
-    private ServerRequest $serverRequest;
-    private ErrorHandler $errorHandler;
+    private ServerRequestFactory $serverRequestFactory;
+    private ErrorRendererInterface $errorRenderer;
     private Service $service;
 
     public function __construct(
         WebApplication $webApplication,
-        ServerRequest $serverRequest,
-        ErrorHandler $errorHandler,
+        ServerRequestFactory $serverRequestFactory,
+        ErrorRendererInterface $errorRenderer,
         Service $service
     ) {
         $this->webApplication = $webApplication;
-        $this->serverRequest = $serverRequest;
-        $this->errorHandler = $errorHandler;
+        $this->serverRequestFactory = $serverRequestFactory;
+        $this->errorRenderer = $errorRenderer;
         $this->service = $service;
     }
 
@@ -62,18 +59,18 @@ class Server implements ServerInterface
     public function handleRequest(Request $request, Response $response): void
     {
         try {
-            $serverRequest = $this->serverRequest->create($request);
+            $serverRequest = $this->serverRequestFactory->create($request);
 
             $this->send(
                 $serverRequest,
                 $response,
                 $this->webApplication->handleRequest($serverRequest)
             );
-        } catch (Throwable $e) {
+        } catch (Throwable $t) {
             try {
-                $response->end($this->errorHandler->renderException($e, $serverRequest));
-            } catch (Throwable $e) {
-                $response->end($e->getMessage());
+                $response->end($this->errorRenderer->render($t, $serverRequest));
+            } catch (Throwable $t) {
+                $response->end($t->getMessage());
             }
         }
     }

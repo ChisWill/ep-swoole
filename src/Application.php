@@ -4,37 +4,53 @@ declare(strict_types=1);
 
 namespace Ep\Swoole;
 
+use Ep;
+use Ep\Base\Application as BaseApplication;
 use Ep\Console\Application as Console;
 use Ep\Contract\ConsoleRequestInterface;
+use Yiisoft\Injector\Injector;
 
-final class Application
+final class Application extends BaseApplication
 {
     private Config $config;
+    private Injector $injector;
+    private Console $console;
 
     public function __construct(array $config)
     {
         $this->config = new Config($config);
+
+        Ep::init($this->config->appConfig);
+
+        $container = Ep::getDi();
+        $this->injector = $container->get(Injector::class);
+        $this->console = $container->get(Console::class);
     }
 
-    public function run(): void
+    public function createRequest(): ConsoleRequestInterface
     {
-        $console = new Console($this->config->appConfig);
-
-        $request = $console->createRequest();
-
-        $console->register($request);
-
-        $this->handlerRequest($request);
+        return $this->console->createRequest();
     }
 
-    private function handlerRequest(ConsoleRequestInterface $request)
+    public function register($request): void
+    {
+        $this->console->register($request);
+    }
+
+    /**
+     * @param ConsoleRequestInterface $request
+     */
+    public function handleRequest($request): void
     {
         $command = $this->parseRoute($request->getRoute());
         $settings = $this->parseParams($request->getParams());
         switch ($command) {
             case '':
             case 'start':
-                $server = new SwooleServer($this->config, $settings);
+                $server = $this->injector->make(SwooleServer::class, [
+                    'config' => $this->config,
+                    'settings' => $settings
+                ]);
                 $server->run();
                 break;
             case 'stop':
@@ -47,16 +63,20 @@ Usage: php yourfile <command> [mode]
 Commands: start, stop, reload
 Modes: -d
 HELP;
-                exit(1);
         }
     }
 
-    private function parseRoute(string $route)
+    public function send($request, $response): void
+    {
+        exit(1);
+    }
+
+    private function parseRoute(string $route): string
     {
         return trim($route, '/');
     }
 
-    private function parseParams(array $params)
+    private function parseParams(array $params): array
     {
         $settings['daemonize'] = ($params['d'] ?? false) === true;
         return $settings;

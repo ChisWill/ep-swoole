@@ -7,6 +7,7 @@ use Ep;
 use Ep\Tests\App\Component\Controller;
 use Ep\Tests\App\Model\User;
 use Ep\Web\ServerRequest;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Yiisoft\Cookies\Cookie;
 use Yiisoft\Cookies\CookieCollection;
@@ -46,6 +47,7 @@ class DemoController extends Controller
 
     public function requestAction(ServerRequest $request)
     {
+        1 / 0;
         $result = [
             'Method' => $request->getMethod(),
             'All GET' => $request->getQueryParams(),
@@ -111,9 +113,8 @@ class DemoController extends Controller
         return $result;
     }
 
-    public function eventAction()
+    public function eventAction(EventDispatcherInterface $dipatcher)
     {
-        $dipatcher = Ep::getEventDispatcher();
         $dipatcher->dispatch($this);
     }
 

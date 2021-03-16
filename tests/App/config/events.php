@@ -1,7 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 use Ep\Tests\App\Controller\DemoController;
 
 return [
-    DemoController::class => [fn (DemoController $event) => $event->testAction()]
+    DemoController::class => [
+        function (DemoController $event) {
+            echo $event->id;
+        }
+    ]
 ];

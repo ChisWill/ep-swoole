@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Ep\Swoole;
 
-use Ep;
 use Ep\Swoole\Contract\ServerInterface;
 use Ep\Swoole\Http\Server as HttpServer;
 use Ep\Swoole\Tcp\Server as TcpServer;
 use Ep\Swoole\WebSocket\Server as WebSocketServer;
+use Yiisoft\Injector\Injector;
 use Swoole\Runtime;
 use InvalidArgumentException;
 
@@ -20,11 +20,13 @@ final class SwooleServer
 
     private Config $config;
     private array $settings;
+    private Injector $injector;
 
-    public function __construct(Config $config, array $settings)
+    public function __construct(Config $config, array $settings, Injector $injector)
     {
         $this->config = $config;
         $this->settings = $settings + $this->config->settings;
+        $this->injector = $injector;
     }
 
     public function run(): void
@@ -42,11 +44,11 @@ final class SwooleServer
     {
         switch ($this->config->type) {
             case self::HTTP:
-                return Ep::getInjector()->make(HttpServer::class);
+                return $this->injector->make(HttpServer::class);
             case self::WEBSOCKET:
-                return Ep::getInjector()->make(WebSocketServer::class);
+                return $this->injector->make(WebSocketServer::class);
             case self::TCP:
-                return Ep::getInjector()->make(TcpServer::class);
+                return $this->injector->make(TcpServer::class);
             default:
                 throw new InvalidArgumentException('The "type" configuration is invalid.');
         }

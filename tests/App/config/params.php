@@ -1,5 +1,3 @@
 <?php
 
-return [
-    'domain' => 'ep.cc'
-];
+return [];
