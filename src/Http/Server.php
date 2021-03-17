@@ -59,7 +59,7 @@ class Server implements ServerInterface
     public function handleRequest(Request $request, Response $response): void
     {
         try {
-            $serverRequest = $this->serverRequestFactory->create($request);
+            $serverRequest = $this->serverRequestFactory->createFromSwooleRequest($request);
 
             $this->send(
                 $serverRequest,
@@ -76,16 +76,15 @@ class Server implements ServerInterface
      */
     private function send(ServerRequestInterface $request, Response $response, $result): void
     {
+        if (is_string($result)) {
+            $result = $this->service->string($result);
+        } elseif (is_array($result)) {
+            $result = $this->service->json($result);
+        }
         if ($result instanceof ResponseInterface) {
             (new Emitter($response))->emit($result, $request->getMethod() === Method::HEAD);
         } else {
-            if (is_string($result)) {
-                $this->send($request, $response, $this->service->string($result));
-            } elseif (is_array($result)) {
-                $this->send($request, $response, $this->service->json($result));
-            } else {
-                $response->end();
-            }
+            $response->end();
         }
     }
 }

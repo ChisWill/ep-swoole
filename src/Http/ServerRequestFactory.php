@@ -46,7 +46,7 @@ final class ServerRequestFactory implements ServerRequestInterface
         $this->streamFactory = $streamFactory;
     }
 
-    public function create(Request $request): ServerRequest
+    public function createFromSwooleRequest(Request $request): ServerRequest
     {
         $new = clone $this;
 
