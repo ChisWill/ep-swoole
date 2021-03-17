@@ -9,10 +9,6 @@ use InvalidArgumentException;
 final class Config
 {
     /**
-     * 应用配置项
-     */
-    public array $appConfig = [];
-    /**
      * 主服务基本配置项，仅支持异步服务端
      * 
      * @see https://wiki.swoole.com/#/server/methods?id=__construct

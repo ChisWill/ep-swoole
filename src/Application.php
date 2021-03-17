@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Ep\Swoole;
 
-use Ep;
 use Ep\Base\Application as BaseApplication;
 use Ep\Console\Application as Console;
 use Ep\Contract\ConsoleRequestInterface;
@@ -12,19 +11,21 @@ use Yiisoft\Injector\Injector;
 
 final class Application extends BaseApplication
 {
-    private Config $config;
-    private Injector $injector;
     private Console $console;
+    private Injector $injector;
 
-    public function __construct(array $config)
+    public function __construct(Console $console, Injector $injector)
+    {
+        $this->console = $console;
+        $this->injector = $injector;
+    }
+
+    private Config $config;
+
+    public function setConfig(array $config): self
     {
         $this->config = new Config($config);
-
-        Ep::init($this->config->appConfig);
-
-        $container = Ep::getDi();
-        $this->injector = $container->get(Injector::class);
-        $this->console = $container->get(Console::class);
+        return $this;
     }
 
     public function createRequest(): ConsoleRequestInterface
@@ -68,7 +69,7 @@ HELP;
 
     public function send($request, $response): void
     {
-        exit(1);
+        exit(0);
     }
 
     private function parseRoute(string $route): string

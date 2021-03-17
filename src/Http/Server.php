@@ -67,11 +67,7 @@ class Server implements ServerInterface
                 $this->webApplication->handleRequest($serverRequest)
             );
         } catch (Throwable $t) {
-            try {
-                $response->end($this->errorRenderer->render($t, $serverRequest));
-            } catch (Throwable $t) {
-                $response->end($t->getMessage());
-            }
+            $response->end($this->errorRenderer->render($t, $serverRequest));
         }
     }
 

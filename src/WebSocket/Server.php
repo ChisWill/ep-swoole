@@ -6,8 +6,8 @@ namespace Ep\Swoole\WebSocket;
 
 use Ep\Swoole\Http\Server as HttpServer;
 use Ep\Swoole\SwooleEvent;
+use Swoole\WebSocket\Frame;
 use Swoole\WebSocket\Server as WebSocketServer;
-use Throwable;
 
 class Server extends HttpServer
 {
@@ -24,8 +24,7 @@ class Server extends HttpServer
      */
     protected function onRequest(): void
     {
-        $this->getServer()->on(SwooleEvent::ON_MESSAGE, function (\Swoole\WebSocket\Server $server, \Swoole\WebSocket\Frame $frame) {
-            // $server->
+        $this->getServer()->on(SwooleEvent::ON_MESSAGE, function (WebSocketServer $server, Frame $frame) {
             $server->push($frame->fd, $frame->data);
         });
 

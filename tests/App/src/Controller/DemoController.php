@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ep\Tests\App\Controller;
 
 use DateInterval;
@@ -47,7 +49,6 @@ class DemoController extends Controller
 
     public function requestAction(ServerRequest $request)
     {
-        1 / 0;
         $result = [
             'Method' => $request->getMethod(),
             'All GET' => $request->getQueryParams(),
