@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Ep\Swoole\Http;
 
-use Ep\Web\ServerRequest;
 use Yiisoft\Http\Method;
 use Swoole\Http\Request;
 use Psr\Http\Message\ServerRequestFactoryInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UploadedFileFactoryInterface;
@@ -34,7 +34,7 @@ final class ServerRequestFactory
         $this->streamFactory = $streamFactory;
     }
 
-    public function createFromSwooleRequest(Request $request): ServerRequest
+    public function createFromSwooleRequest(Request $request): ServerRequestInterface
     {
         $method = $request->server['request_method'] ?? Method::GET;
         $uri = $this->initUri($request);
@@ -55,7 +55,7 @@ final class ServerRequestFactory
             ->withUploadedFiles($this->initUploadedFiles($request->files ?: []))
             ->withBody($this->initStream($request));
 
-        return new ServerRequest($serverRequest);
+        return $serverRequest;
     }
 
     private function initProtocolVersion(array $server, string $default): string
