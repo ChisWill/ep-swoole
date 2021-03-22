@@ -22,7 +22,7 @@ final class Application extends BaseApplication
 
     private Config $config;
 
-    public function setConfig(array $config): self
+    public function set(array $config): self
     {
         $this->config = new Config($config);
         return $this;
@@ -67,6 +67,10 @@ HELP;
         }
     }
 
+    /**
+     * @param ConsoleRequestInterface $request
+     * @param void                    $response
+     */
     public function send($request, $response): void
     {
         exit(0);

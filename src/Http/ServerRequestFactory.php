@@ -47,15 +47,13 @@ final class ServerRequestFactory
             $serverRequest = $serverRequest->withAddedHeader($name, $value);
         }
 
-        $serverRequest = $serverRequest
+        return $serverRequest
             ->withProtocolVersion($this->initProtocolVersion($request->server, '1.1'))
             ->withQueryParams($request->get ?: [])
             ->withParsedBody($request->post ?: [])
             ->withCookieParams($request->cookie ?: [])
             ->withUploadedFiles($this->initUploadedFiles($request->files ?: []))
             ->withBody($this->initStream($request));
-
-        return $serverRequest;
     }
 
     private function initProtocolVersion(array $server, string $default): string
