@@ -1,6 +1,7 @@
 <script src="https://lib.baomitu.com/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.3/socket.io.min.js"></script>
 
-<h1>Swoole WebSocket Server</h1>
+<h1>SocketIO</h1>
 
 <div>
     <input type="text" id="text">
@@ -14,8 +15,9 @@
 </div>
 
 <script>
-    var wsServer = 'ws://127.0.0.1:9501';
-    var websocket = new WebSocket(wsServer);
+    const socket = io("ws://127.0.0.1:9501", {
+        transports: ['websocket']
+    });
 
     var display = function(data, type = 2) {
         var date = new Date;
@@ -34,23 +36,15 @@
     $("#button").click(function() {
         var data = $("#text").val();
         display(data, 1);
-        websocket.send(data);
+        console.log(data);
+        socket.emit('send', data);
     });
 
-    websocket.onopen = function(evt) {
-        display('Connected to WebSocket server.');
-        websocket.send('hello');
-    };
+    socket.on("connect", function() {
+        console.log(2345);
+    });
 
-    websocket.onclose = function(evt) {
-        display("Disconnected");
-    };
-
-    websocket.onmessage = function(evt) {
-        display(evt.data);
-    };
-
-    websocket.onerror = function(evt, e) {
-        display('Error occured: ' + evt.data);
-    };
+    socket.on('msg', data => {
+        display(data);
+    });
 </script>

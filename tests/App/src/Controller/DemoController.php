@@ -164,6 +164,11 @@ class DemoController extends Controller
         return $this->render('ws');
     }
 
+    public function socketioAction()
+    {
+        return $this->render('socketio');
+    }
+
     public function getCookieAction(ServerRequestInterface $request)
     {
         $cookies = CookieCollection::fromArray($request->getCookieParams());
