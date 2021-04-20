@@ -56,35 +56,23 @@ class Server implements ServerInterface
         $this->getServer()->on(SwooleEvent::ON_REQUEST, [$this, 'handleRequest']);
     }
 
-    public function handleRequest(Request $request, Response $response): void
+    public function handleRequest(Request $swooleRequest, Response $swooleResponse): void
     {
         try {
-            $serverRequest = $this->serverRequestFactory->createFromSwooleRequest($request);
+            $psrRequest = $this->serverRequestFactory->createFromSwooleRequest($swooleRequest);
 
             $this->send(
-                $serverRequest,
-                $response,
-                $this->webApplication->handleRequest($serverRequest)
+                $psrRequest,
+                $this->webApplication->handleRequest($psrRequest),
+                $swooleResponse
             );
         } catch (Throwable $t) {
-            $response->end($this->errorRenderer->render($t, $serverRequest));
+            $swooleResponse->end($this->errorRenderer->render($t, $psrRequest));
         }
     }
 
-    /**
-     * @param mixed $result
-     */
-    private function send(ServerRequestInterface $request, Response $response, $result): void
+    private function send(ServerRequestInterface $psrRequest, ResponseInterface $psrResponse, Response $swooleResponse): void
     {
-        if (is_string($result)) {
-            $result = $this->service->string($result);
-        } elseif (is_array($result)) {
-            $result = $this->service->json($result);
-        }
-        if ($result instanceof ResponseInterface) {
-            (new Emitter($response))->emit($result, $request->getMethod() === Method::HEAD);
-        } else {
-            $response->end();
-        }
+        (new Emitter($swooleResponse))->emit($psrResponse, $psrRequest->getMethod() === Method::HEAD);
     }
 }

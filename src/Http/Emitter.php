@@ -60,7 +60,7 @@ final class Emitter
             $body->rewind();
         }
         while (!$body->eof()) {
-            $this->response->write($body->read(1048576));
+            $this->response->write($body->read(8_388_608));
         }
         $this->response->end();
     }

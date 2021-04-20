@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use Ep\Swoole\Config;
+use Ep\Base\Config;
 
-return static fn (Config $config): array => [
-];
+return static fn (Config $config): array => [];

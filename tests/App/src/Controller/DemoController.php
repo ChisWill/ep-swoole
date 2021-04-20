@@ -188,8 +188,6 @@ class DemoController extends Controller
 
     public function testAction()
     {
-        echo 'test string';
-
         return 'over';
     }
 }

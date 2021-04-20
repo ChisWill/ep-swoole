@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ep\Swoole\Http;
 
+use Ep\Web\ServerRequest;
 use Yiisoft\Http\Method;
 use Swoole\Http\Request;
 use Psr\Http\Message\ServerRequestFactoryInterface;
@@ -38,7 +39,7 @@ final class ServerRequestFactory
     {
         $method = $request->server['request_method'] ?? Method::GET;
         $uri = $this->initUri($request);
-        $serverRequest = $this->serverRequestFactory->createServerRequest($method, $uri, $request->server);
+        $serverRequest = new ServerRequest($this->serverRequestFactory->createServerRequest($method, $uri, $request->server));
 
         foreach ($request->header as $name => $value) {
             if ($name === 'host' && $serverRequest->hasHeader('host')) {
