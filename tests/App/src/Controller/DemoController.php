@@ -11,8 +11,10 @@ use Ep\Tests\App\Model\User;
 use Ep\Web\ServerRequest;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Log\LoggerInterface;
 use Yiisoft\Cookies\Cookie;
 use Yiisoft\Cookies\CookieCollection;
+use Yiisoft\Db\Redis\Connection;
 use Yiisoft\Http\Method;
 
 class DemoController extends Controller
@@ -69,9 +71,8 @@ class DemoController extends Controller
         return $this->redirect($url);
     }
 
-    public function loggerAction()
+    public function loggerAction(LoggerInterface $logger)
     {
-        $logger = Ep::getLogger();
         $logger->info('halo');
         return $this->string('over');
     }
@@ -119,10 +120,8 @@ class DemoController extends Controller
         $dipatcher->dispatch($this);
     }
 
-    public function redisAction()
+    public function redisAction(Connection $redis)
     {
-        $redis = Ep::getRedis();
-
         $result = [];
         $r = $redis->set('a', mt_rand(0, 100), 'ex', 5, 'nx');
         $result['set'] = $r;

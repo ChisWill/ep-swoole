@@ -22,9 +22,4 @@ class IndexController extends Controller
     {
         return $this->string('迷路了', Status::NOT_FOUND);
     }
-
-    public function errorAction()
-    {
-        return $this->string('我错了');
-    }
 }
