@@ -6,8 +6,8 @@ namespace Ep\Swoole;
 
 use Ep\Swoole\Command\StartCommand;
 use Ep\Swoole\Command\StopCommand;
-use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Application as SymfonyApplication;
+use Psr\Container\ContainerInterface;
 
 final class Application
 {
