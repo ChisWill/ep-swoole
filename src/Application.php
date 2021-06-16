@@ -4,86 +4,39 @@ declare(strict_types=1);
 
 namespace Ep\Swoole;
 
-use Ep\Base\Application as BaseApplication;
-use Ep\Console\Application as Console;
-use Ep\Contract\ConsoleRequestInterface;
-use Yiisoft\Injector\Injector;
+use Ep\Swoole\Command\StartCommand;
+use Ep\Swoole\Command\StopCommand;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\Console\Application as SymfonyApplication;
 
-final class Application extends BaseApplication
+final class Application
 {
-    private Console $console;
-    private Injector $injector;
+    private array $commands = [
+        StartCommand::class,
+        StopCommand::class
+    ];
 
-    public function __construct(Console $console, Injector $injector)
-    {
-        $this->console = $console;
-        $this->injector = $injector;
+    private SymfonyApplication $symfonyApplication;
+    private ContainerInterface $container;
+
+    public function __construct(
+        SymfonyApplication $symfonyApplication,
+        ContainerInterface $container
+    ) {
+        $this->symfonyApplication = $symfonyApplication;
+        $this->container = $container;
     }
 
-    private Config $config;
-
-    public function set(array $config): self
+    public function run(array $swooleConfig): void
     {
-        $this->config = new Config($config);
-        return $this;
-    }
-
-    public function createRequest(): ConsoleRequestInterface
-    {
-        return $this->console->createRequest();
-    }
-
-    public function register($request): void
-    {
-        $this->console->register($request);
-    }
-
-    /**
-     * @param ConsoleRequestInterface $request
-     */
-    public function handleRequest($request): void
-    {
-        $command = $this->parseRoute($request->getRoute());
-        $settings = $this->parseParams($request->getParams());
-        switch ($command) {
-            case '':
-            case 'start':
-                $server = $this->injector->make(SwooleServer::class, [
-                    'config' => $this->config,
-                    'settings' => $settings
-                ]);
-                $server->run();
-                break;
-            case 'stop':
-                break;
-            case 'reload':
-                break;
-            default:
-                echo <<<HELP
-Usage: php yourfile <command> [mode]
-Commands: start, stop, reload
-Modes: -d
-HELP;
+        foreach ($this->commands as $class) {
+            $command = $this->container->get($class);
+            if ($command instanceof StartCommand) {
+                $command->setConfig($swooleConfig);
+            }
+            $this->symfonyApplication->add($command);
         }
-    }
 
-    /**
-     * @param ConsoleRequestInterface $request
-     * @param void                    $response
-     */
-    public function send($request, $response): void
-    {
-        exit(0);
-    }
-
-    private function parseRoute(string $route): string
-    {
-        return trim($route, '/');
-    }
-
-    private function parseParams(array $params): array
-    {
-        $settings['daemonize'] = ($params['d'] ?? false) === true;
-        return $settings;
+        $this->symfonyApplication->run();
     }
 }

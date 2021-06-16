@@ -12,7 +12,7 @@ use Yiisoft\Injector\Injector;
 use Swoole\Runtime;
 use InvalidArgumentException;
 
-final class SwooleServer
+final class Server
 {
     public const HTTP = 1;
     public const WEBSOCKET = 2;

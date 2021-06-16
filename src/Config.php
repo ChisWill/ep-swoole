@@ -20,7 +20,7 @@ final class Config
     /**
      * 主服务类型
      */
-    public int $type = SwooleServer::HTTP;
+    public int $type = Server::HTTP;
     /**
      * 主服务配置
      * 

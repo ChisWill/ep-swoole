@@ -38,7 +38,7 @@ final class ServerRequestFactory
     public function createFromSwooleRequest(Request $request): ServerRequestInterface
     {
         $method = $request->server['request_method'] ?? Method::GET;
-        $uri = $this->initUri($request);
+        $uri = $this->getUri($request);
         $serverRequest = new ServerRequest($this->serverRequestFactory->createServerRequest($method, $uri, $request->server));
 
         foreach ($request->header as $name => $value) {
@@ -49,15 +49,15 @@ final class ServerRequestFactory
         }
 
         return $serverRequest
-            ->withProtocolVersion($this->initProtocolVersion($request->server, '1.1'))
+            ->withProtocolVersion($this->getProtocolVersion($request->server, '1.1'))
             ->withQueryParams($request->get ?: [])
             ->withParsedBody($request->post ?: [])
             ->withCookieParams($request->cookie ?: [])
-            ->withUploadedFiles($this->initUploadedFiles($request->files ?: []))
-            ->withBody($this->initStream($request));
+            ->withUploadedFiles($this->getUploadedFiles($request->files ?: []))
+            ->withBody($this->getStream($request));
     }
 
-    private function initProtocolVersion(array $server, string $default): string
+    private function getProtocolVersion(array $server, string $default): string
     {
         if (array_key_exists('server_protocol', $server) && $server['server_protocol'] !== '') {
             return str_replace('HTTP/', '', $server['server_protocol']);
@@ -66,7 +66,7 @@ final class ServerRequestFactory
         }
     }
 
-    private function initUri(Request $request): UriInterface
+    private function getUri(Request $request): UriInterface
     {
         $uri = $this->uriFactory->createUri();
 
@@ -77,7 +77,7 @@ final class ServerRequestFactory
         }
 
         if (isset($request->header['host'])) {
-            if (1 === preg_match('/^(.+):(\d+)$/', $request->header['host'], $matches)) {
+            if (preg_match('/^(.+):(\d+)$/', $request->header['host'], $matches) === 1) {
                 $uri = $uri->withHost($matches[1])->withPort($matches[2]);
             } else {
                 $uri = $uri->withHost($request->header['host']);
@@ -101,7 +101,7 @@ final class ServerRequestFactory
         return $uri;
     }
 
-    private function initStream(Request $request): StreamInterface
+    private function getStream(Request $request): StreamInterface
     {
         if (strpos($request->header['content-type'] ?? '', 'multipart/form-data') !== false) {
             return $this->streamFactory->createStream();
@@ -110,7 +110,7 @@ final class ServerRequestFactory
         }
     }
 
-    private function initUploadedFiles(array $swooleFiles): array
+    private function getUploadedFiles(array $swooleFiles): array
     {
         $files = [];
         if ($swooleFiles) {

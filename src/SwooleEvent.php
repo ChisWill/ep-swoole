@@ -42,25 +42,24 @@ final class SwooleEvent
 
     public const ON_AFTER_RELOAD = 'afterReload';
     /**
-     * WebSocket Event.
+     * WebSocket Event
      */
     public const ON_HAND_SHAKE = 'handshake';
     /**
-     * WebSocket Event.
+     * WebSocket Event
      */
     public const ON_OPEN = 'open';
     /**
-     * WebSocket Event.
+     * WebSocket Event
      */
     public const ON_MESSAGE = 'message';
     /**
-     * Http Event.
+     * Http Event
      */
     public const ON_REQUEST = 'request';
 
-    public static function isSwooleEvent($event): bool
+    public static function isSwooleEvent(string $event): bool
     {
-        $consts = (new ReflectionClass(self::class))->getConstants();
-        return in_array($event, $consts);
+        return in_array($event, (new ReflectionClass(self::class))->getConstants());
     }
 }

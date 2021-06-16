@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-use Ep\Swoole\SwooleServer;
+use Ep\Swoole\Server;
 
 return [
     'host' => '0.0.0.0',
     'port' => 9501,
-    'type' => SwooleServer::WEBSOCKET,
+    'type' => Server::WEBSOCKET,
     'settings' => [],
     'events' => [],
     'servers' => [

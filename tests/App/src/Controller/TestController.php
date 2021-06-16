@@ -5,7 +5,12 @@ declare(strict_types=1);
 namespace Ep\Tests\App\Controller;
 
 use Ep;
+use Ep\Annotation\Aspect;
+use Ep\Annotation\Service;
+use Ep\Tests\App\Aspect\EchoIntAspect;
 use Ep\Tests\App\Component\Controller;
+use Ep\Tests\App\Middleware\TimeMiddleware;
+use Ep\Tests\App\Service\TestService;
 use Ep\Web\ErrorHandler;
 use Psr\Http\Message\ServerRequestInterface;
 use RuntimeException;
@@ -13,6 +18,18 @@ use RuntimeException;
 class TestController extends Controller
 {
     public string $title = 'Test';
+
+    /**
+     * @Service
+     */
+    private TestService $service;
+
+    public function __construct()
+    {
+        $this->setMiddlewares([
+            TimeMiddleware::class
+        ]);
+    }
 
     public function indexAction(ServerRequestInterface $req)
     {
@@ -41,6 +58,14 @@ class TestController extends Controller
                 'msg' => 'ok'
             ]
         ];
+    }
+
+    /**
+     * @Aspect(EchoIntAspect::class)
+     */
+    public function aspectAction()
+    {
+        return $this->string($this->service->getRandomString());
     }
 
     public function errorAction(ServerRequestInterface $request)
