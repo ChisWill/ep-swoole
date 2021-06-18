@@ -47,6 +47,22 @@ trait ServerTrait
         $this->server->start();
     }
 
+    /**
+     * @param Server|Port $port
+     */
+    private function onEvents($port, array $events): void
+    {
+        foreach ($events as $event => $callback) {
+            if (!SwooleEvent::isSwooleEvent($event)) {
+                throw new InvalidArgumentException("The \"servers[events]\" configuration must have Swoole Event as the key of the array.");
+            }
+            if (!is_callable($callback)) {
+                throw new InvalidArgumentException("The \"servers[events]\" configuration is an array of string-callback pairs.");
+            }
+            $port->on($event, $callback);
+        }
+    }
+
     private function listenServers(Server $server, array $servers): void
     {
         foreach ($servers as $config) {
@@ -66,22 +82,6 @@ trait ServerTrait
             } else {
                 throw new InvalidArgumentException("Failed to listen server port [{$config['host']}:{$config['port']}]");
             }
-        }
-    }
-
-    /**
-     * @param Server|Port $port
-     */
-    private function onEvents($port, array $events): void
-    {
-        foreach ($events as $event => $callback) {
-            if (!SwooleEvent::isSwooleEvent($event)) {
-                throw new InvalidArgumentException("The \"servers[events]\" configuration must have Swoole Event as the key of the array.");
-            }
-            if (!is_callable($callback)) {
-                throw new InvalidArgumentException("The \"servers[events]\" configuration is an array of string-callback pairs.");
-            }
-            $port->on($event, $callback);
         }
     }
 

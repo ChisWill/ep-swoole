@@ -34,7 +34,7 @@ final class Config
      */
     public array $events = [];
     /**
-     * 子服务配置，除了不需要`$mode`外，其它与主服务配置相同
+     * 子服务配置，除了不需要 `mode` 外，其它与主服务配置相同
      */
     public array $servers = [];
 

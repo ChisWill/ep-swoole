@@ -68,6 +68,10 @@ class TestController extends Controller
         return $this->string($this->service->getRandomString());
     }
 
+    public function tAction()
+    {
+    }
+
     public function errorAction(ServerRequestInterface $request)
     {
         $handler = Ep::getDi()->get(ErrorHandler::class);

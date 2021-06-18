@@ -6,12 +6,12 @@
     "minimum-stability": "dev",
     "require": {
         "php": ">=7.4",
-        "ext-swoole": "*",
+        "ext-swoole": "^4.6",
         "chiswill/ep": "*",
         "symfony/console": "^5.2"
     },
     "require-dev": {
-        "swoole/ide-helper": "~4.5.10"
+        "swoole/ide-helper": "^4.6"
     },
     "autoload": {
         "psr-4": {
