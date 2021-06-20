@@ -9,12 +9,12 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Ep\Annotation\Service;
+use Ep\Annotation\Inject;
 
 final class TimeMiddleware implements MiddlewareInterface
 {
     /**
-     * @Service
+     * @Inject
      */
     private WebService $service;
 

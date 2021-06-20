@@ -6,7 +6,7 @@ namespace Ep\Tests\App\Controller;
 
 use Ep;
 use Ep\Annotation\Aspect;
-use Ep\Annotation\Service;
+use Ep\Annotation\Inject;
 use Ep\Tests\App\Aspect\EchoIntAspect;
 use Ep\Tests\App\Component\Controller;
 use Ep\Tests\App\Middleware\TimeMiddleware;
@@ -20,7 +20,7 @@ class TestController extends Controller
     public string $title = 'Test';
 
     /**
-     * @Service
+     * @Inject
      */
     private TestService $service;
 
