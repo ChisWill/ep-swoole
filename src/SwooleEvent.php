@@ -58,8 +58,13 @@ final class SwooleEvent
      */
     public const ON_REQUEST = 'request';
 
+    private static ?array $events = null;
+
     public static function isSwooleEvent(string $event): bool
     {
-        return in_array($event, (new ReflectionClass(self::class))->getConstants());
+        if (self::$events === null) {
+            self::$events = (new ReflectionClass(self::class))->getConstants();
+        }
+        return in_array($event, self::$events, true);
     }
 }

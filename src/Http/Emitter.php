@@ -28,14 +28,13 @@ final class Emitter
 
     public function emit(ResponseInterface $response, bool $withoutBody = false): void
     {
-        $status = $response->getStatusCode();
         $withoutBody = $withoutBody || !$this->shouldOutputBody($response);
         $withoutContentLength = $withoutBody || $response->hasHeader('Transfer-Encoding');
         if ($withoutContentLength) {
             $response = $response->withoutHeader('Content-Length');
         }
 
-        $this->response->setStatusCode($status);
+        $this->response->setStatusCode($response->getStatusCode());
 
         foreach ($response->getHeaders() as $header => $values) {
             $this->response->setHeader($header, implode(';', $values));

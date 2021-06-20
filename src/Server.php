@@ -18,15 +18,15 @@ final class Server
     public const WEBSOCKET = 2;
     public const TCP = 3;
 
+    private Injector $injector;
     private Config $config;
     private array $settings;
-    private Injector $injector;
 
-    public function __construct(Config $config, array $settings, Injector $injector)
+    public function __construct(Injector $injector, Config $config, array $settings)
     {
+        $this->injector = $injector;
         $this->config = $config;
         $this->settings = $settings + $this->config->settings;
-        $this->injector = $injector;
     }
 
     public function run(): void

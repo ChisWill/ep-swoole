@@ -61,7 +61,7 @@ class Server implements ServerInterface
         try {
             $psrRequest = $this->serverRequestFactory->createFromSwooleRequest($swooleRequest);
 
-            $this->send(
+            $this->emit(
                 $psrRequest,
                 $this->webApplication->handleRequest($psrRequest),
                 $swooleResponse
@@ -71,7 +71,7 @@ class Server implements ServerInterface
         }
     }
 
-    private function send(ServerRequestInterface $psrRequest, ResponseInterface $psrResponse, Response $swooleResponse): void
+    private function emit(ServerRequestInterface $psrRequest, ResponseInterface $psrResponse, Response $swooleResponse): void
     {
         (new Emitter($swooleResponse))->emit($psrResponse, $psrRequest->getMethod() === Method::HEAD);
     }
