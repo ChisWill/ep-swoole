@@ -173,6 +173,7 @@ class DemoController extends Controller
         $cookies = CookieCollection::fromArray($request->getCookieParams());
 
         return [
+            'cookies' => $request->getCookieParams(),
             'testcookie' => $cookies->getValue('testcookie')
         ];
     }

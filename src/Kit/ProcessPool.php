@@ -8,10 +8,10 @@ use Swoole\Process\Pool;
 
 final class ProcessPool
 {
-    public function simpleWork(array $data, callable $callback): void
+    public function simpleDo(array $data, callable $callback): void
     {
         $pool = new Pool(count($data));
-        $pool->on('workerStart', static fn (Pool $pool, int $workerId) => $callback($data[$workerId], $pool));
+        $pool->on('workerStart', static fn (Pool $pool, int $workerId) => $callback($data[$workerId], $pool->getProcess($workerId), $pool));
         $pool->start();
     }
 }

@@ -6,21 +6,51 @@ namespace Ep\Tests\App\Command;
 
 use Ep;
 use Ep\Console\Command;
-use Ep\Contract\ConsoleRequestInterface;
+use Ep\Swoole\Kit\ProcessPool;
+use Exception;
+use Swoole\Coroutine;
+use Swoole\Coroutine\Barrier;
+use Swoole\Process;
+use Swoole\Process\Pool;
 
 class InitCommand extends Command
 {
-    public function indexAction(ConsoleRequestInterface $request)
+    public function indexAction()
     {
         $message = 'Welcome Basic';
 
-        tes($message, $request->getParams());
+        return $this->success($message);
     }
 
     public function logAction()
     {
         Ep::getLogger()->info('log info', ['act' => self::class]);
 
-        return 'ok';
+        return $this->success();
+    }
+
+    public function taskAction()
+    {
+        $pool = new ProcessPool();
+        $tasks = [
+            [
+                'command' => self::class,
+                'action' => 'indexAction',
+                'delay' => 1
+            ],
+            [
+                'command' => self::class,
+                'action' => 'logAction',
+                'delay' => 2
+            ],
+        ];
+        $pool->simpleDo($tasks, function ($task, Process $process, Pool $pool) {
+            $process = new Process(function () {
+                echo 1;
+            });
+            $process->start();
+            sleep($task['delay']);
+        });
+        return $this->success();
     }
 }
