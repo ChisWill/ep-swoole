@@ -61,7 +61,7 @@ class DemoController extends Controller
             'Header' => $request->getHeaders(),
             'Path' => $request->getUri()->getPath()
         ];
-        return $result;
+        return $this->json($result);
     }
 
     public function redirectAction(ServerRequestInterface $request)
@@ -98,7 +98,7 @@ class DemoController extends Controller
         $user->username = 'Mary' . mt_rand(0, 1000);
         $r2 = $user->update();
 
-        return compact('r1', 'r2');
+        return $this->json(compact('r1', 'r2'));
     }
 
     public function queryAction()
@@ -112,12 +112,14 @@ class DemoController extends Controller
         $list = $query->asArray()->all();
         $result['All'] = $list;
 
-        return $result;
+        return $this->json($result);
     }
 
     public function eventAction(EventDispatcherInterface $dipatcher)
     {
         $dipatcher->dispatch($this);
+
+        return $this->string();
     }
 
     public function redisAction(Connection $redis)
@@ -128,7 +130,7 @@ class DemoController extends Controller
         $r = $redis->get('a');
         $result['get'] = $r;
 
-        return $result;
+        return $this->json($result);
     }
 
     public function validateAction()
@@ -136,9 +138,9 @@ class DemoController extends Controller
         $user = User::findModel(1);
         $r = $user->validate();
         if ($r) {
-            return 'validate ok';
+            return $this->string('validate ok');
         } else {
-            return $user->getErrors();
+            return $this->json($user->getErrors());
         }
     }
 
@@ -172,10 +174,10 @@ class DemoController extends Controller
     {
         $cookies = CookieCollection::fromArray($request->getCookieParams());
 
-        return [
+        return $this->json([
             'cookies' => $request->getCookieParams(),
             'testcookie' => $cookies->getValue('testcookie')
-        ];
+        ]);
     }
 
     public function setCookieAction()
@@ -188,6 +190,6 @@ class DemoController extends Controller
 
     public function testAction()
     {
-        return 'over';
+        return $this->string('over');
     }
 }

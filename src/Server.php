@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Ep\Swoole;
 
+use Ep\Contract\InjectorInterface;
 use Ep\Swoole\Contract\ServerInterface;
 use Ep\Swoole\Http\Server as HttpServer;
 use Ep\Swoole\Tcp\Server as TcpServer;
 use Ep\Swoole\WebSocket\Server as WebSocketServer;
-use Yiisoft\Injector\Injector;
 use Swoole\Runtime;
 use InvalidArgumentException;
 
@@ -18,11 +18,11 @@ final class Server
     public const WEBSOCKET = 2;
     public const TCP = 3;
 
-    private Injector $injector;
+    private InjectorInterface $injector;
     private Config $config;
     private array $settings;
 
-    public function __construct(Injector $injector, Config $config, array $settings)
+    public function __construct(InjectorInterface $injector, Config $config, array $settings)
     {
         $this->injector = $injector;
         $this->config = $config;

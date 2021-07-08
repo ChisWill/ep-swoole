@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Ep\Swoole;
 
+use Ep\Console\Application as ConsoleApplication;
 use Ep\Swoole\Command\StartCommand;
 use Ep\Swoole\Command\StopCommand;
-use Symfony\Component\Console\Application as SymfonyApplication;
 use Psr\Container\ContainerInterface;
 
 final class Application
@@ -16,14 +16,14 @@ final class Application
         StopCommand::class
     ];
 
-    private SymfonyApplication $symfonyApplication;
+    private ConsoleApplication $application;
     private ContainerInterface $container;
 
     public function __construct(
-        SymfonyApplication $symfonyApplication,
+        ConsoleApplication $application,
         ContainerInterface $container
     ) {
-        $this->symfonyApplication = $symfonyApplication;
+        $this->application = $application;
         $this->container = $container;
     }
 
@@ -34,9 +34,9 @@ final class Application
             if ($command instanceof StartCommand) {
                 $command->setConfig($swooleConfig);
             }
-            $this->symfonyApplication->add($command);
+            $this->application->add($command);
         }
 
-        $this->symfonyApplication->run();
+        $this->application->run();
     }
 }
