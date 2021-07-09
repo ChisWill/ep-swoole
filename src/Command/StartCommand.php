@@ -23,15 +23,19 @@ final class StartCommand extends Command
         $this->injector = $injector;
     }
 
-    protected function configure()
+    /**
+     * {@inheritDoc}
+     */
+    protected function configure(): void
     {
         $this
             ->setDescription('Run swoole server')
-            ->setDefinition([
-                new InputOption('daemonize', 'd', InputOption::VALUE_NONE, 'Server start in <comment>DAEMON</> mode')
-            ]);
+            ->addOption('daemonize', 'd', InputOption::VALUE_NONE, 'Server start in <comment>DAEMON</> mode');
     }
 
+    /**
+     * {@inheritDoc}
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $settings['daemonize'] = $input->getOption('daemonize');

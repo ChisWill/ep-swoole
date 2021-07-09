@@ -15,11 +15,17 @@ final class StopCommand extends Command
         parent::__construct('stop');
     }
 
-    protected function configure()
+    /**
+     * {@inheritDoc}
+     */
+    protected function configure(): void
     {
         $this->setDescription('Stop swoole server');
     }
 
+    /**
+     * {@inheritDoc}
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         return self::SUCCESS;
