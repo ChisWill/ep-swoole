@@ -7,7 +7,6 @@ namespace Ep\Swoole\Http;
 use Ep\Contract\ErrorRendererInterface;
 use Ep\Swoole\Contract\ServerInterface;
 use Ep\Swoole\Contract\ServerTrait;
-use Ep\Swoole\Http\Emitter;
 use Ep\Swoole\SwooleEvent;
 use Ep\Web\Application as WebApplication;
 use Ep\Web\Service;
@@ -73,6 +72,9 @@ class Server implements ServerInterface
 
     private function emit(ServerRequestInterface $psrRequest, ResponseInterface $psrResponse, Response $swooleResponse): void
     {
-        (new Emitter($swooleResponse))->emit($psrResponse, $psrRequest->getMethod() === Method::HEAD);
+        (new SapiEmitter($swooleResponse))->emit(
+            $psrResponse,
+            $psrRequest->getMethod() === Method::HEAD
+        );
     }
 }

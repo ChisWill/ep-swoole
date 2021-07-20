@@ -9,6 +9,8 @@ require(dirname(__DIR__, 3) . '/vendor/autoload.php');
 
 Ep::init(require(dirname(__DIR__) . '/config/main.php'));
 
-Ep::getDi()
+$exitCode = Ep::getDi()
     ->get(Application::class)
     ->run(require(dirname(__DIR__) . '/config/swoole.php'));
+
+exit($exitCode);

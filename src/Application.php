@@ -11,7 +11,7 @@ use Psr\Container\ContainerInterface;
 
 final class Application
 {
-    private array $commands = [
+    private const DEFAULT_COMMANDS = [
         StartCommand::class,
         StopCommand::class
     ];
@@ -27,9 +27,18 @@ final class Application
         $this->container = $container;
     }
 
-    public function run(array $swooleConfig): void
+    private array $commands = [];
+
+    public function withCommands(array $commands): self
     {
-        foreach ($this->commands as $class) {
+        $new = clone $this;
+        $new->commands = $commands;
+        return $new;
+    }
+
+    public function run(array $swooleConfig): int
+    {
+        foreach (array_merge(self::DEFAULT_COMMANDS, $this->commands) as $class) {
             $command = $this->container->get($class);
             if ($command instanceof StartCommand) {
                 $command->setConfig($swooleConfig);
@@ -37,6 +46,6 @@ final class Application
             $this->application->add($command);
         }
 
-        $this->application->run();
+        return $this->application->run();
     }
 }

@@ -8,7 +8,7 @@ use Yiisoft\Http\Status;
 use Swoole\Http\Response;
 use Psr\Http\Message\ResponseInterface;
 
-final class Emitter
+final class SapiEmitter
 {
     private const NO_BODY_RESPONSE_CODES = [
         Status::CONTINUE,
@@ -37,7 +37,7 @@ final class Emitter
         $this->response->setStatusCode($response->getStatusCode());
 
         foreach ($response->getHeaders() as $header => $values) {
-            $this->response->setHeader($header, implode(';', $values));
+            $this->response->setHeader($header, $values, false);
         }
 
         if (!$withoutBody) {
@@ -47,7 +47,6 @@ final class Emitter
                     $this->response->setHeader('Content-Length', (string) $contentLength);
                 }
             }
-
             $this->emitBody($response);
         }
     }
