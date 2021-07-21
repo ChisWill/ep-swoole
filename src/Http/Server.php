@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Ep\Swoole\Http;
 
-use Ep\Contract\ErrorRendererInterface;
 use Ep\Swoole\Contract\ServerInterface;
 use Ep\Swoole\Contract\ServerTrait;
 use Ep\Swoole\SwooleEvent;
 use Ep\Web\Application as WebApplication;
+use Ep\Web\ErrorRenderer;
 use Ep\Web\Service;
 use Yiisoft\Http\Method;
 use Swoole\Http\Request;
@@ -24,13 +24,13 @@ class Server implements ServerInterface
 
     private WebApplication $webApplication;
     private ServerRequestFactory $serverRequestFactory;
-    private ErrorRendererInterface $errorRenderer;
+    private ErrorRenderer $errorRenderer;
     private Service $service;
 
     public function __construct(
         WebApplication $webApplication,
         ServerRequestFactory $serverRequestFactory,
-        ErrorRendererInterface $errorRenderer,
+        ErrorRenderer $errorRenderer,
         Service $service
     ) {
         $this->webApplication = $webApplication;

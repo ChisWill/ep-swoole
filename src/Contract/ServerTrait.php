@@ -18,8 +18,12 @@ trait ServerTrait
      */
     private array $ports;
 
+    protected Config $config;
+
     public function init(Config $config): void
     {
+        $this->config = $config;
+
         $class = $this->getServerClass();
         $this->server = new $class(
             $config->host,

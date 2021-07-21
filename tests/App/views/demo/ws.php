@@ -6,6 +6,7 @@
     <input type="text" id="text">
 
     <input type="button" id="button" value="提交">
+    <input type="button" id="emitButton" value="发射">
 </div>
 
 <h3>消息区域</h3>
@@ -37,9 +38,14 @@
         websocket.send(data);
     });
 
+    $("#emitButton").click(function() {
+        var data = $("#text").val();
+        display(data, 1);
+        websocket.emit('user', data);
+    })
+
     websocket.onopen = function(evt) {
         display('Connected to WebSocket server.');
-        websocket.send('hello');
     };
 
     websocket.onclose = function(evt) {
@@ -53,4 +59,10 @@
     websocket.onerror = function(evt, e) {
         display('Error occured: ' + evt.data);
     };
+    websocket.emit = function(type, data) {
+        this.send(JSON.stringify([
+            type,
+            data
+        ]));
+    }
 </script>

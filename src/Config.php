@@ -9,6 +9,10 @@ use InvalidArgumentException;
 final class Config
 {
     /**
+     * Socket controller suffix
+     */
+    public string $socketSuffix = 'Socket';
+    /**
      * 主服务基本配置项，仅支持异步服务端
      * 
      * @see https://wiki.swoole.com/#/server/methods?id=__construct
