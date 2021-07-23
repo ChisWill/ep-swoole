@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ep\Swoole\Tcp;
 
+use Ep\Swoole\Config;
 use Ep\Swoole\Contract\ServerInterface;
 use Ep\Swoole\Contract\ServerTrait;
 use Ep\Swoole\SwooleEvent;
@@ -12,6 +13,13 @@ use Swoole\Server as SwooleServer;
 class Server implements ServerInterface
 {
     use ServerTrait;
+
+    private Config $config;
+
+    public function __construct(Config $config)
+    {
+        $this->config = $config;
+    }
 
     /**
      * {@inheritDoc}

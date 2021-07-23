@@ -29,10 +29,6 @@ final class SapiEmitter
     public function emit(ResponseInterface $response, bool $withoutBody = false): void
     {
         $withoutBody = $withoutBody || !$this->shouldOutputBody($response);
-        $withoutContentLength = $withoutBody || $response->hasHeader('Transfer-Encoding');
-        if ($withoutContentLength) {
-            $response = $response->withoutHeader('Content-Length');
-        }
 
         $this->response->setStatusCode($response->getStatusCode());
 
@@ -40,13 +36,9 @@ final class SapiEmitter
             $this->response->setHeader($header, $values, false);
         }
 
-        if (!$withoutBody) {
-            if (!$withoutContentLength && !$response->hasHeader('Content-Length')) {
-                $contentLength = $response->getBody()->getSize();
-                if ($contentLength !== null) {
-                    $this->response->setHeader('Content-Length', (string) $contentLength);
-                }
-            }
+        if ($withoutBody) {
+            $this->response->end();
+        } else {
             $this->emitBody($response);
         }
     }
@@ -58,7 +50,7 @@ final class SapiEmitter
             $body->rewind();
         }
         while (!$body->eof()) {
-            $this->response->write($body->read(8_388_608));
+            $this->response->write($body->read(2_097_152));
         }
         $this->response->end();
     }
@@ -68,21 +60,17 @@ final class SapiEmitter
         if (in_array($response->getStatusCode(), self::NO_BODY_RESPONSE_CODES, true)) {
             return false;
         }
+
         $body = $response->getBody();
         if (!$body->isReadable()) {
             return false;
         }
+
         $size = $body->getSize();
         if ($size !== null) {
             return $size > 0;
         }
-        if ($body->isSeekable()) {
-            $body->rewind();
-            $byte = $body->read(1);
-            if ($byte === '' || $body->eof()) {
-                return false;
-            }
-        }
+
         return true;
     }
 }

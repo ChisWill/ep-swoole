@@ -4,17 +4,37 @@ declare(strict_types=1);
 
 namespace Ep\Swoole\WebSocket;
 
-use Ep;
-use Ep\Base\ControllerLoader;
 use Ep\Base\Route;
+use Ep\Swoole\Config;
+use Ep\Swoole\Contract\ServerInterface;
+use Ep\Swoole\Contract\ServerTrait;
 use Ep\Swoole\Http\Server as HttpServer;
 use Ep\Swoole\SwooleEvent;
 use Swoole\WebSocket\Frame;
 use Swoole\WebSocket\Server as WebSocketServer;
 use Throwable;
 
-class Server extends HttpServer
+final class Server implements ServerInterface
 {
+    use ServerTrait;
+
+    private Config $config;
+    private HttpServer $httpServer;
+    private Route $route;
+    private ControllerRunner $controllerRunner;
+
+    public function __construct(
+        Config $config,
+        HttpServer $httpServer,
+        Route $route,
+        ControllerRunner $controllerRunner
+    ) {
+        $this->config = $config;
+        $this->httpServer = $httpServer;
+        $this->route = $route;
+        $this->controllerRunner = $controllerRunner;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -32,19 +52,17 @@ class Server extends HttpServer
             $this->handleMessage(new Socket($server, $frame));
         });
 
-        $this->getServer()->on(SwooleEvent::ON_REQUEST, [$this, 'handleRequest']);
+        $this->getServer()->on(SwooleEvent::ON_REQUEST, [$this->httpServer, 'handleRequest']);
     }
 
     private function handleMessage(Socket $socket): void
     {
         try {
-            [$ok, $handler,] = Ep::getDi()->get(Route::class)->match($socket->getRoute());
-            $loader = Ep::getInjector()
-                ->make(ControllerLoader::class, [
-                    'suffix' => $this->config->socketSuffix
-                ])
-                ->parse($handler);
-            call_user_func([$loader->getController(), $loader->getAction()], $socket);
+            [, $handler] = $this->route->match($socket->getRoute());
+
+            $this->controllerRunner
+                ->withControllerSuffix($this->config->socketSuffix)
+                ->run($handler, $socket);
         } catch (Throwable $t) {
             $socket->emit($t->getMessage());
         }

@@ -12,29 +12,29 @@ use InvalidArgumentException;
 
 trait ServerTrait
 {
-    private Server $server;
-    /** 
-     * @var Port[] $ports 
-     */
-    private array $ports;
+    private Config $config;
 
-    protected Config $config;
-
-    public function init(Config $config): void
+    public function __construct(Config $config)
     {
         $this->config = $config;
+    }
 
+    private Server $server;
+
+    public function init(): void
+    {
         $class = $this->getServerClass();
+
         $this->server = new $class(
-            $config->host,
-            $config->port,
-            $config->mode,
-            $config->sockType
+            $this->config->host,
+            $this->config->port,
+            $this->config->mode,
+            $this->config->sockType
         );
 
-        $this->onEvents($this->server, $config->events);
+        $this->onEvents($this->server, $this->config->events);
 
-        $this->listenServers($this->server, $config->servers);
+        $this->listenServers($this->server, $this->config->servers);
     }
 
     public function getServer(): Server
@@ -66,6 +66,11 @@ trait ServerTrait
             $port->on($event, $callback);
         }
     }
+
+    /** 
+     * @var Port[] $ports 
+     */
+    private array $ports = [];
 
     private function listenServers(Server $server, array $servers): void
     {

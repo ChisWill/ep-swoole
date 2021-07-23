@@ -9,7 +9,7 @@ use Swoole\Server;
 
 interface ServerInterface
 {
-    public function init(Config $config): void;
+    public function init(): void;
 
     public function start(array $settings): void;
 

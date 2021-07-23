@@ -70,6 +70,7 @@ class TestController extends Controller
 
     public function tAction()
     {
+        return $this->string();
     }
 
     public function errorAction(ServerRequestInterface $request)

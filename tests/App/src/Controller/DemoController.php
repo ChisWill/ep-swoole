@@ -12,6 +12,7 @@ use Ep\Web\ServerRequest;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
+use Yiisoft\Aliases\Aliases;
 use Yiisoft\Cookies\Cookie;
 use Yiisoft\Cookies\CookieCollection;
 use Yiisoft\Db\Redis\Connection;
@@ -99,6 +100,18 @@ class DemoController extends Controller
         $r2 = $user->update();
 
         return $this->json(compact('r1', 'r2'));
+    }
+
+    public function downloadAction(ServerRequest $request, Aliases $aliases)
+    {
+        // $name = 'eye.png';
+        $name = 'face.jpg';
+        $file = $aliases->get('@root/static/image/' . $name);
+
+        $newName = null;
+        $newName = '0!§ $&()=`´{}  []²³@€µ^°_+\' # - _ . , ; ü ä ö ß 9.jpg';
+
+        return $this->getService()->download($file, $newName);
     }
 
     public function queryAction()

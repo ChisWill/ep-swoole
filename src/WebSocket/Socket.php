@@ -18,12 +18,45 @@ final class Socket
         $this->frame = $frame;
     }
 
+    private array $rooms = [];
+
+    public function join(string $room): self
+    {
+        $this->rooms[$room] = $room;
+
+        return $this;
+    }
+
+    public function leave(string $room): self
+    {
+        unset($this->rooms[$room]);
+
+        return $this;
+    }
+
+    public function leaveAll(): self
+    {
+        $this->rooms = [];
+
+        return $this;
+    }
+
     /**
      * @param mixed $data
      */
-    public function emit($data): void
+    public function emit($data): self
     {
-        $this->server->push($this->frame->fd, json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+        $this->server->push($this->frame->fd, $this->encode($data));
+
+        return $this;
+    }
+
+    /**
+     * @param mixed $data
+     */
+    public function broadcast($data): self
+    {
+        return $this;
     }
 
     public function isExists(): bool
@@ -40,6 +73,9 @@ final class Socket
         return $this->route;
     }
 
+    /**
+     * @var mixed
+     */
     private $data = null;
 
     /**
@@ -55,12 +91,20 @@ final class Socket
     private function parseData(): void
     {
         if ($this->data === null) {
-            $frameData = json_decode($this->frame->data);
+            $frameData = json_decode($this->frame->data, true);
             if (is_array($frameData) && count($frameData) >= 2) {
                 [$this->route, $this->data] = $frameData;
             } else {
-                [$this->route, $this->data] = ['/', $frameData];
+                [$this->route, $this->data] = ['/', $this->frame->data];
             }
         }
+    }
+
+    /**
+     * @param mixed $data
+     */
+    private function encode($data): string
+    {
+        return json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     }
 }

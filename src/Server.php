@@ -35,7 +35,7 @@ final class Server
 
         $mainServer = $this->createMainServer();
 
-        $mainServer->init($this->config);
+        $mainServer->init();
 
         $mainServer->start($this->settings);
     }
@@ -44,11 +44,11 @@ final class Server
     {
         switch ($this->config->type) {
             case self::HTTP:
-                return $this->injector->make(HttpServer::class);
+                return $this->injector->make(HttpServer::class, [$this->config]);
             case self::WEBSOCKET:
-                return $this->injector->make(WebSocketServer::class);
+                return $this->injector->make(WebSocketServer::class, [$this->config]);
             case self::TCP:
-                return $this->injector->make(TcpServer::class);
+                return $this->injector->make(TcpServer::class, [$this->config]);
             default:
                 throw new InvalidArgumentException('The "type" configuration is invalid.');
         }

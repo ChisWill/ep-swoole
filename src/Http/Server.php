@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ep\Swoole\Http;
 
+use Ep\Swoole\Config;
 use Ep\Swoole\Contract\ServerInterface;
 use Ep\Swoole\Contract\ServerTrait;
 use Ep\Swoole\SwooleEvent;
@@ -18,21 +19,24 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Throwable;
 
-class Server implements ServerInterface
+final class Server implements ServerInterface
 {
     use ServerTrait;
 
+    private Config $config;
     private WebApplication $webApplication;
     private ServerRequestFactory $serverRequestFactory;
     private ErrorRenderer $errorRenderer;
     private Service $service;
 
     public function __construct(
+        Config $config,
         WebApplication $webApplication,
         ServerRequestFactory $serverRequestFactory,
         ErrorRenderer $errorRenderer,
         Service $service
     ) {
+        $this->config = $config;
         $this->webApplication = $webApplication;
         $this->serverRequestFactory = $serverRequestFactory;
         $this->errorRenderer = $errorRenderer;

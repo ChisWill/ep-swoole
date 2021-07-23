@@ -39,8 +39,12 @@
     });
 
     $("#emitButton").click(function() {
-        var data = $("#text").val();
-        display(data, 1);
+        var text = $("#text").val();
+        var data = {
+            type: 'emit',
+            text: text
+        };
+        display(JSON.stringify(data), 1);
         websocket.emit('user', data);
     })
 
