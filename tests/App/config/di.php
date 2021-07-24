@@ -8,6 +8,7 @@ use Yiisoft\Aliases\Aliases;
 use Yiisoft\Db\Connection\Connection;
 use Yiisoft\Db\Mysql\Connection as MysqlConnection;
 use Yiisoft\Db\Redis\Connection as RedisConnection;
+use Yiisoft\Db\Sqlite\Connection as SqliteConnection;
 use Yiisoft\Log\Logger;
 use Yiisoft\Log\Target\File\FileRotator;
 use Yiisoft\Log\Target\File\FileTarget;
@@ -23,6 +24,11 @@ return static fn (Config $config): array => [
         $logger->setFlushInterval(1);
         return $logger;
     },
+    // Sqlite
+    'sqlite' => [
+        'class' => SqliteConnection::class,
+        '__construct()' => ['sqlite:' . dirname(__FILE__) . '/ep.sqlite'],
+    ],
     // Redis
     RedisConnection::class => [
         'class' => RedisConnection::class,
