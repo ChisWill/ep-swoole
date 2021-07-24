@@ -27,6 +27,9 @@
             "Ep\\Tests\\App\\": "tests/App/src"
         }
     },
+    "scripts": {
+        "post-update-cmd": "php ./vendor/bin/ep scan/annotation"
+    },
     "config": {
         "sort-packages": true
     }
