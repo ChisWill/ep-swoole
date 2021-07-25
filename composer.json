@@ -4,10 +4,11 @@
     "type": "library",
     "license": "MIT",
     "minimum-stability": "dev",
+    "prefer-stable": true,
     "require": {
         "php": ">=7.4",
         "ext-swoole": "^4.6",
-        "chiswill/ep": "*",
+        "chiswill/ep": "dev-master",
         "symfony/console": "^5.2"
     },
     "require-dev": {
