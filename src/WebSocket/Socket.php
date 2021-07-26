@@ -18,6 +18,16 @@ final class Socket
         $this->frame = $frame;
     }
 
+    public function getServer(): Server
+    {
+        return $this->server;
+    }
+
+    public function getFrame(): Frame
+    {
+        return $this->frame;
+    }
+
     private array $rooms = [];
 
     public function join(string $room): self
@@ -44,9 +54,9 @@ final class Socket
     /**
      * @param mixed $data
      */
-    public function emit($data): self
+    public function emit($data, int $fd = null): self
     {
-        $this->server->push($this->frame->fd, $this->encode($data));
+        $this->server->push($fd ?? $this->frame->fd, $this->encode($data));
 
         return $this;
     }
@@ -59,9 +69,9 @@ final class Socket
         return $this;
     }
 
-    public function isExists(): bool
+    public function isExists(int $fd = null): bool
     {
-        return $this->server->isEstablished($this->frame->fd);
+        return $this->server->isEstablished($fd ?? $this->frame->fd);
     }
 
     private string $route;

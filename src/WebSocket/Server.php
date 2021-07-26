@@ -64,7 +64,7 @@ final class Server implements ServerInterface
                 ->withControllerSuffix($this->config->socketSuffix)
                 ->run($handler, $socket);
         } catch (Throwable $t) {
-            $socket->emit($t->getMessage());
+            $socket->emit($t->getMessage() . ' in ' . $t->getFile() . ':' . $t->getLine());
         }
     }
 }

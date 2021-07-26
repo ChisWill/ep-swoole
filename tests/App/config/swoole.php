@@ -9,7 +9,7 @@ return [
     'port' => 9501,
     'type' => Server::WEBSOCKET,
     'settings' => [
-        'worker_num' => 2,
+        'worker_num' => 1,
     ],
     'events' => [],
     'servers' => [
