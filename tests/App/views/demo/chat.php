@@ -23,6 +23,11 @@
         margin-right: 10px;
     }
 
+    #message-are .end {
+        height: 0px;
+        overflow: hidden;
+    }
+
     #input-box {
         resize: none;
         width: 100%;
@@ -44,6 +49,7 @@
     <div class="center">Now</div>
     <div class="left">Target</div>
     <div class="right">Self</div>
+    <div class="end"></div>
 </div>
 
 <div id="login-area">
@@ -68,7 +74,8 @@
         let msg = data + ' ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds();
 
         $msg = $("<div>").addClass(type).html(msg);
-        $("#message-area").append($msg);
+        $("#message-area .end").before($msg);
+        $("#message-area .end")[0].scrollIntoView();
     }
 
     websocket.emit = function(type, data = '') {

@@ -67,7 +67,6 @@ final class ChatService
     public function getTarget(Socket $socket)
     {
         $self = $socket->getFrame()->fd;
-        t($socket->getServer()->info);
         foreach ($socket->getServer()->info as $fd => $info) {
             if ($fd !== $self) {
                 if ($socket->isExists($fd)) {
