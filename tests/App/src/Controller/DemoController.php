@@ -177,14 +177,25 @@ class DemoController extends Controller
     {
         return $this->render('ws');
     }
-    
+
     public function chatAction(ServerRequest $request)
     {
         $this->getView()->layout = 'chat';
+        $this->title = 'Simple Chat Room';
 
         $id = $request->getQueryParams()['id'] ?? '';
 
         return $this->render('chat', compact('id'));
+    }
+
+    public function chatRoomAction(ServerRequest $request)
+    {
+        $this->getView()->layout = 'chat';
+        $this->title = 'Chat Room';
+
+        $id = $request->getQueryParams()['id'] ?? '';
+
+        return $this->render('chatRoom', compact('id'));
     }
 
     public function socketioAction()

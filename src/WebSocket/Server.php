@@ -19,17 +19,20 @@ final class Server implements ServerInterface
     use ServerTrait;
 
     private Config $config;
+    private Factory $factory;
     private HttpServer $httpServer;
     private Route $route;
     private ControllerRunner $controllerRunner;
 
     public function __construct(
         Config $config,
+        Factory $factory,
         HttpServer $httpServer,
         Route $route,
         ControllerRunner $controllerRunner
     ) {
         $this->config = $config;
+        $this->factory = $factory;
         $this->httpServer = $httpServer;
         $this->route = $route;
         $this->controllerRunner = $controllerRunner;
@@ -49,7 +52,7 @@ final class Server implements ServerInterface
     protected function onRequest(): void
     {
         $this->getServer()->on(SwooleEvent::ON_MESSAGE, function (WebSocketServer $server, Frame $frame): void {
-            $this->handleMessage(new Socket($server, $frame));
+            $this->handleMessage($this->factory->createSocket($server, $frame));
         });
 
         $this->getServer()->on(SwooleEvent::ON_REQUEST, [$this->httpServer, 'handleRequest']);

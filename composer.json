@@ -17,6 +17,9 @@
         "yiisoft/db-redis": "1.0.x-dev",
         "yiisoft/db-sqlite": "dev-master"
     },
+    "suggest": {
+        "yiisoft/db-redis": "Allows websocket server working with multiple process"
+    },
     "autoload": {
         "psr-4": {
             "Ep\\Swoole\\": "src"

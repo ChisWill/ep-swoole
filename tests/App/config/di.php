@@ -3,6 +3,9 @@
 declare(strict_types=1);
 
 use Ep\Base\Config;
+use Ep\Swoole\Contract\NspAdapterInterface;
+use Ep\Swoole\WebSocket\NspAdapter\ArrayAdapter;
+use Ep\Swoole\WebSocket\NspAdapter\RedisAdapter;
 use Psr\Log\LoggerInterface;
 use Yiisoft\Aliases\Aliases;
 use Yiisoft\Db\Connection\Connection;
@@ -24,6 +27,7 @@ return static fn (Config $config): array => [
         $logger->setFlushInterval(1);
         return $logger;
     },
+    NspAdapterInterface::class => ArrayAdapter::class,
     // Sqlite
     'sqlite' => [
         'class' => SqliteConnection::class,

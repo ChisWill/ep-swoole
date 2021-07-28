@@ -11,11 +11,16 @@ final class Socket
 {
     private Server $server;
     private Frame $frame;
+    private Nsp $nsp;
 
-    public function __construct(Server $server, Frame $frame)
-    {
+    public function __construct(
+        Server $server,
+        Frame $frame,
+        Nsp $nsp
+    ) {
         $this->server = $server;
         $this->frame = $frame;
+        $this->nsp = $nsp;
     }
 
     public function getServer(): Server
@@ -28,25 +33,28 @@ final class Socket
         return $this->frame;
     }
 
-    private array $rooms = [];
-
     public function join(string $room): self
     {
-        $this->rooms[$room] = $room;
+        $this->nsp->join($this->frame->fd, $room);
 
         return $this;
+    }
+
+    public function to(string $room): self
+    {
+        $this->nsp->to($this->frame->fd, $room);
+
+        return $this;
+    }
+
+    public function room(): ?string
+    {
+        return $this->nsp->find($this->frame->fd);
     }
 
     public function leave(string $room): self
     {
-        unset($this->rooms[$room]);
-
-        return $this;
-    }
-
-    public function leaveAll(): self
-    {
-        $this->rooms = [];
+        $this->nsp->leave($this->frame->fd, $room);
 
         return $this;
     }
@@ -66,6 +74,17 @@ final class Socket
      */
     public function broadcast($data): self
     {
+        $room = $this->nsp->find($this->frame->fd);
+        if ($room === null) {
+            return $this;
+        }
+
+        foreach ($this->nsp->connections($room) as $fd) {
+            $fd = (int) $fd;
+            if ($this->frame->fd !== $fd) {
+                $this->emit($data, $fd);
+            }
+        }
         return $this;
     }
 
@@ -107,6 +126,7 @@ final class Socket
             } else {
                 [$this->route, $this->data] = ['/', $this->frame->data];
             }
+            $this->route = '/' . trim($this->route, '/');
         }
     }
 

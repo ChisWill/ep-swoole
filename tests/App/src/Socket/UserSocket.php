@@ -8,6 +8,7 @@ use Ep\Annotation\Inject;
 use Ep\Swoole\WebSocket\Controller;
 use Ep\Swoole\WebSocket\Socket;
 use Ep\Tests\App\Service\ChatService;
+use Throwable;
 
 class UserSocket extends Controller
 {
@@ -25,6 +26,15 @@ class UserSocket extends Controller
         ],
         3 => [
             'name' => 'Jack'
+        ],
+        4 => [
+            'name' => 'Rose'
+        ],
+        5 => [
+            'name' => 'Peter'
+        ],
+        6 => [
+            'name' => 'Mary'
         ]
     ];
 
@@ -62,6 +72,15 @@ class UserSocket extends Controller
         $this->chatService->addUser($socket, $info);
 
         $this->emit($socket, 'Welcome ' . $info['name']);
+    }
+
+    public function roomAction(Socket $socket)
+    {
+        try {
+            $this->chatService->enterRoom($socket, $socket->getData());
+        } catch (Throwable $t) {
+            echo $t->getMessage() . ' in ' . $t->getFile() . ':' . $t->getLine();
+        }
     }
 
     public function logoutAction(Socket $socket)

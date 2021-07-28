@@ -20,6 +20,10 @@ final class ChatService
         return !isset($socket->getServer()->info[$socket->getFrame()->fd]);
     }
 
+    //-------------------------------------------------
+    //                简单聊天
+    //-------------------------------------------------
+
     private array $users = [];
 
     public function isUsed(Socket $socket, int $id): bool
@@ -100,6 +104,40 @@ final class ChatService
             $socket->emit([
                 'type' => 'system',
                 'data' => '对方不在线'
+            ]);
+        }
+    }
+
+    //-------------------------------------------------
+    //                聊天室
+    //-------------------------------------------------
+
+    public function enterRoom(Socket $socket, string $room): void
+    {
+        $r = $socket->room();
+        if ($r) {
+            $socket->leave($r);
+        }
+        $socket->join($room)->to($room);
+
+        $socket->emit([
+            'type' => 'system',
+            'data' => '你进入了房间"' . $room . '"'
+        ]);
+    }
+
+    public function broadcast(Socket $socket, $data): void
+    {
+        if (!$socket->room()) {
+            $socket->emit([
+                'type' => 'system',
+                'data' => '你当前不在任何房间'
+            ]);
+        } else {
+            $socket->broadcast([
+                'type' => 'msg',
+                'target' => 'target',
+                'data' => $data
             ]);
         }
     }

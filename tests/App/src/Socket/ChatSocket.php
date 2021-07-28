@@ -26,6 +26,16 @@ class ChatSocket extends Controller
         $this->chatService->sendTarget($socket, $socket->getData());
     }
 
+    public function sendRoomTextAction(Socket $socket)
+    {
+        if ($this->chatService->isGuest($socket)) {
+            $this->emit($socket, 'Login Required.', 'system');
+            return;
+        }
+
+        $this->chatService->broadcast($socket, $socket->getData());
+    }
+
     private function emit(Socket $socket, $data, string $type = 'msg'): void
     {
         $socket->emit([

@@ -7,6 +7,7 @@ namespace Ep\Tests\App\Controller;
 use Ep;
 use Ep\Annotation\Aspect;
 use Ep\Annotation\Inject;
+use Ep\Swoole\WebSocket\Nsp;
 use Ep\Tests\App\Aspect\EchoIntAspect;
 use Ep\Tests\App\Component\Controller;
 use Ep\Tests\App\Middleware\TimeMiddleware;
@@ -14,6 +15,7 @@ use Ep\Tests\App\Service\TestService;
 use Ep\Web\ErrorHandler;
 use Psr\Http\Message\ServerRequestInterface;
 use RuntimeException;
+use Yiisoft\Db\Redis\Connection;
 
 class TestController extends Controller
 {
@@ -58,6 +60,26 @@ class TestController extends Controller
                 'msg' => 'ok'
             ]
         ];
+    }
+
+    public function nspAction(Nsp $nsp)
+    {
+        $nsp->join('1', 'bike');
+        $nsp->join('1', 'car');
+        $nsp->join('2', 'car');
+        $nsp->join('3', 'car');
+
+        $nsp->to('1', 'car');
+        $nsp->to('2', 'bike');
+
+        $nsp->leave('1', 'car');
+
+        return $this->json([
+            'connections1' => $nsp->connections('bike'),
+            'connections2' => $nsp->connections('car'),
+            'current1' => $nsp->find('1'),
+            'current2' => $nsp->find('2')
+        ]);
     }
 
     /**
