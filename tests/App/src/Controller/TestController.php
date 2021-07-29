@@ -62,23 +62,22 @@ class TestController extends Controller
         ];
     }
 
-    public function nspAction(Nsp $nsp)
+    public function nspAction(Nsp $nsp, Connection $redis)
     {
-        $nsp->join('1', 'bike');
         $nsp->join('1', 'car');
         $nsp->join('2', 'car');
         $nsp->join('3', 'car');
 
-        $nsp->to('1', 'car');
-        $nsp->to('2', 'bike');
+        $b1 = $nsp->exists('1', 'car');
+        $b2 = $nsp->exists('2', 'bike');
 
         $nsp->leave('1', 'car');
 
         return $this->json([
             'connections1' => $nsp->connections('bike'),
             'connections2' => $nsp->connections('car'),
-            'current1' => $nsp->find('1'),
-            'current2' => $nsp->find('2')
+            'exists1' => $b1,
+            'exists2' => $b2
         ]);
     }
 

@@ -10,9 +10,7 @@ interface NspAdapterInterface
 
     public function values(string $key): array;
 
+    public function exists(string $key, string $value): bool;
+
     public function remove(string $key, string $value): void;
-
-    public function set(string $key, ?string $value): void;
-
-    public function get(string $key): ?string;
 }

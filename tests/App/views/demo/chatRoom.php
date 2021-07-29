@@ -119,6 +119,7 @@
         let id = $("#login-id").val();
         if (!id) {
             alert('Require Id');
+            return;
         }
         websocket.emit('user/login', id);
     });
@@ -126,6 +127,7 @@
         let room = $("#hall-id").val();
         if (!room) {
             alert('Require Room name');
+            return;
         }
         websocket.emit('user/room', room);
     });
@@ -133,8 +135,12 @@
         let text = $("#input-box").val();
         if (!text) {
             alert('Empty text');
+            return;
         }
         display(text, 'right');
-        websocket.emit('chat/sendRoomText', text);
+        websocket.emit('chat/sendRoomText', {
+            text: text,
+            room: $("#hall-id").val()
+        });
     });
 </script>

@@ -9,7 +9,6 @@ use Ep\Swoole\Contract\NspAdapterInterface;
 final class Nsp
 {
     private const PREFIX_ROOM = 'Ep-WS-Room-';
-    private const PREFIX_CURRENT = 'Ep-WS-Current-';
 
     private NspAdapterInterface $adapter;
 
@@ -21,9 +20,9 @@ final class Nsp
     /**
      * @param int|string $id
      */
-    public function join($id, string $name): self
+    public function join($id, string $room): self
     {
-        $this->adapter->add(self::PREFIX_ROOM . $name, (string) $id);
+        $this->adapter->add(self::PREFIX_ROOM . $room, (string) $id);
 
         return $this;
     }
@@ -31,21 +30,9 @@ final class Nsp
     /**
      * @param int|string $id
      */
-    public function to($id, string $name): self
+    public function exists($id, string $room): bool
     {
-        $this->join($id, $name);
-
-        $this->adapter->set(self::PREFIX_CURRENT . $id, $name);
-
-        return $this;
-    }
-
-    /**
-     * @param int|string $id
-     */
-    public function find($id): ?string
-    {
-        return $this->adapter->get(self::PREFIX_CURRENT . $id);
+        return $this->adapter->exists(self::PREFIX_ROOM . $room, (string) $id);
     }
 
     public function connections(string $room): array
@@ -59,10 +46,6 @@ final class Nsp
     public function leave($id, string $room): self
     {
         $this->adapter->remove(self::PREFIX_ROOM . $room, (string) $id);
-
-        if ($room === $this->find($id)) {
-            $this->adapter->set(self::PREFIX_CURRENT . $id, null);
-        }
 
         return $this;
     }

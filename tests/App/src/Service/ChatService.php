@@ -73,7 +73,7 @@ final class ChatService
         $self = $socket->getFrame()->fd;
         foreach ($socket->getServer()->info as $fd => $info) {
             if ($fd !== $self) {
-                if ($socket->isExists($fd)) {
+                if ($socket->isOnline($fd)) {
                     return $fd;
                 } else {
                     unset($socket->getServer()->info[$fd]);
@@ -94,7 +94,7 @@ final class ChatService
             return;
         }
 
-        if ($socket->isExists($target)) {
+        if ($socket->isOnline($target)) {
             $socket->emit([
                 'type' => 'msg',
                 'target' => 'target',
@@ -114,11 +114,7 @@ final class ChatService
 
     public function enterRoom(Socket $socket, string $room): void
     {
-        $r = $socket->room();
-        if ($r) {
-            $socket->leave($r);
-        }
-        $socket->join($room)->to($room);
+        $socket->join($room);
 
         $socket->emit([
             'type' => 'system',
@@ -128,16 +124,16 @@ final class ChatService
 
     public function broadcast(Socket $socket, $data): void
     {
-        if (!$socket->room()) {
+        if (!$socket->in($data['room'])) {
             $socket->emit([
                 'type' => 'system',
-                'data' => '你当前不在任何房间'
+                'data' => '你不在当前房间'
             ]);
         } else {
-            $socket->broadcast([
+            $socket->broadcast($data['room'], [
                 'type' => 'msg',
                 'target' => 'target',
-                'data' => $data
+                'data' => $data['text']
             ]);
         }
     }

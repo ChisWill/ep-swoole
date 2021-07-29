@@ -40,23 +40,16 @@ final class Socket
         return $this;
     }
 
-    public function to(string $room): self
-    {
-        $this->nsp->to($this->frame->fd, $room);
-
-        return $this;
-    }
-
-    public function room(): ?string
-    {
-        return $this->nsp->find($this->frame->fd);
-    }
-
     public function leave(string $room): self
     {
         $this->nsp->leave($this->frame->fd, $room);
 
         return $this;
+    }
+
+    public function in(string $room, int $fd = null): bool
+    {
+        return $this->nsp->exists((string) ($fd ?? $this->frame->fd), $room);
     }
 
     /**
@@ -72,14 +65,13 @@ final class Socket
     /**
      * @param mixed $data
      */
-    public function broadcast($data): self
+    public function broadcast(string $to, $data): self
     {
-        $room = $this->nsp->find($this->frame->fd);
-        if ($room === null) {
+        if (!$this->nsp->exists($this->frame->fd, $to)) {
             return $this;
         }
 
-        foreach ($this->nsp->connections($room) as $fd) {
+        foreach ($this->nsp->connections($to) as $fd) {
             $fd = (int) $fd;
             if ($this->frame->fd !== $fd) {
                 $this->emit($data, $fd);
@@ -88,7 +80,7 @@ final class Socket
         return $this;
     }
 
-    public function isExists(int $fd = null): bool
+    public function isOnline(int $fd = null): bool
     {
         return $this->server->isEstablished($fd ?? $this->frame->fd);
     }

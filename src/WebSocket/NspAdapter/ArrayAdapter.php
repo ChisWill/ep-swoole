@@ -29,28 +29,16 @@ final class ArrayAdapter implements NspAdapterInterface
     /**
      * {@inheritDoc}
      */
+    public function exists(string $key, string $value): bool
+    {
+        return isset($this->array[$key][$value]);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function remove(string $key, string $value): void
     {
         unset($this->array[$key][$value]);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function set(string $key, ?string $value): void
-    {
-        if ($value === null) {
-            unset($this->array[$key]);
-        } else {
-            $this->array[$key] = $value;
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function get(string $key): ?string
-    {
-        return $this->array[$key] ?? null;
     }
 }
