@@ -11,7 +11,7 @@ final class Config
     /**
      * Socket controller suffix
      */
-    public string $socketSuffix = 'Socket';
+    public string $webSocketSuffix = 'Socket';
     /**
      * 主服务基本配置项，仅支持异步服务端
      * 

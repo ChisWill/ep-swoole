@@ -52,22 +52,22 @@ final class Server implements ServerInterface
     protected function onRequest(): void
     {
         $this->getServer()->on(SwooleEvent::ON_MESSAGE, function (WebSocketServer $server, Frame $frame): void {
-            $this->handleMessage($this->factory->createSocket($server, $frame));
+            $this->handleMessage($this->factory->createRequest($server, $frame));
         });
 
         $this->getServer()->on(SwooleEvent::ON_REQUEST, [$this->httpServer, 'handleRequest']);
     }
 
-    private function handleMessage(Socket $socket): void
+    private function handleMessage(Request $request): void
     {
         try {
-            [, $handler] = $this->route->match($socket->getRoute());
+            [, $handler] = $this->route->match($request->getRoute());
 
             $this->controllerRunner
-                ->withControllerSuffix($this->config->socketSuffix)
-                ->run($handler, $socket);
+                ->withControllerSuffix($this->config->webSocketSuffix)
+                ->run($handler, $request);
         } catch (Throwable $t) {
-            $socket->emit($t->getMessage() . ' in ' . $t->getFile() . ':' . $t->getLine());
+            $request->emit($t->getMessage() . ' in ' . $t->getFile() . ':' . $t->getLine());
         }
     }
 }

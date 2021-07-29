@@ -6,7 +6,7 @@ namespace Ep\Tests\App\Socket;
 
 use Ep\Annotation\Inject;
 use Ep\Swoole\WebSocket\Controller;
-use Ep\Swoole\WebSocket\Socket;
+use Ep\Swoole\WebSocket\Request;
 use Ep\Tests\App\Service\ChatService;
 use Throwable;
 
@@ -38,30 +38,30 @@ class UserSocket extends Controller
         ]
     ];
 
-    public function indexAction(Socket $socket)
+    public function indexAction(Request $request)
     {
         $data = [
             'id' => 1,
             'name' => 'a'
         ];
-        $socket->emit($data);
+        $request->emit($data);
     }
 
-    public function loginAction(Socket $socket)
+    public function loginAction(Request $request)
     {
-        if (!$this->chatService->isGuest($socket)) {
-            $this->emit($socket, 'Logined.');
+        if (!$this->chatService->isGuest($request)) {
+            $this->emit($request, 'Logined.');
             return;
         }
 
-        $id = (int) $socket->getData();
+        $id = (int) $request->getData();
         if (!array_key_exists($id, $this->userList)) {
-            $this->emit($socket, 'Id is invalid.');
+            $this->emit($request, 'Id is invalid.');
             return;
         }
 
-        if ($this->chatService->isUsed($socket, $id)) {
-            $this->emit($socket, $this->userList[$id]['name'] . ' had been used.');
+        if ($this->chatService->isUsed($request, $id)) {
+            $this->emit($request, $this->userList[$id]['name'] . ' had been used.');
             return;
         }
 
@@ -69,28 +69,28 @@ class UserSocket extends Controller
             'id' => $id,
         ] + $this->userList[$id];
 
-        $this->chatService->addUser($socket, $info);
+        $this->chatService->addUser($request, $info);
 
-        $this->emit($socket, 'Welcome ' . $info['name']);
+        $this->emit($request, 'Welcome ' . $info['name']);
     }
 
-    public function roomAction(Socket $socket)
+    public function roomAction(Request $request)
     {
         try {
-            $this->chatService->enterRoom($socket, $socket->getData());
+            $this->chatService->enterRoom($request, $request->getData());
         } catch (Throwable $t) {
             echo $t->getMessage() . ' in ' . $t->getFile() . ':' . $t->getLine();
         }
     }
 
-    public function logoutAction(Socket $socket)
+    public function logoutAction(Request $request)
     {
-        $this->chatService->removeUser($socket);
+        $this->chatService->removeUser($request);
     }
 
-    private function emit(Socket $socket, $data): void
+    private function emit(Request $request, $data): void
     {
-        $socket->emit([
+        $request->emit([
             'type' => 'system',
             'data' => $data
         ]);

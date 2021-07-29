@@ -23,12 +23,12 @@ abstract class Controller implements ControllerInterface
      */
     public string $actionId;
 
-    public function before(Socket $socket): bool
+    public function before(Request $request): bool
     {
         return true;
     }
 
-    public function after(Socket $socket): void
+    public function after(Request $request): void
     {
     }
 

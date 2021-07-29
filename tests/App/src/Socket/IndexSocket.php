@@ -5,29 +5,29 @@ declare(strict_types=1);
 namespace Ep\Tests\App\Socket;
 
 use Ep\Swoole\WebSocket\Controller;
-use Ep\Swoole\WebSocket\Socket;
+use Ep\Swoole\WebSocket\Request;
 
 class IndexSocket extends Controller
 {
-    public function before(Socket $socket): bool
+    public function before(Request $request): bool
     {
-        $socket->emit('before');
+        $request->emit('before');
         return true;
     }
 
-    public function after(Socket $socket): void
+    public function after(Request $request): void
     {
-        $socket->emit('after');
+        $request->emit('after');
     }
 
-    public function indexAction(Socket $socket)
+    public function indexAction(Request $request)
     {
         $params = [
             'id' => $this->id,
             'actionId' => $this->actionId,
-            'route' => $socket->getRoute(),
-            'receive' => $socket->getData(),
+            'route' => $request->getRoute(),
+            'receive' => $request->getData(),
         ];
-        $socket->emit($params);
+        $request->emit($params);
     }
 }

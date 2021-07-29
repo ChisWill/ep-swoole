@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace Ep\Tests\App\Service;
 
-use Ep\Swoole\WebSocket\Socket;
+use Ep\Swoole\WebSocket\Request;
 
 final class ChatService
 {
-    private function init(Socket $socket)
+    private function init(Request $request)
     {
-        $socket->getServer()->info ??= [];
+        $request->getServer()->info ??= [];
     }
 
-    public function isGuest(Socket $socket): bool
+    public function isGuest(Request $request): bool
     {
-        $this->init($socket);
+        $this->init($request);
 
-        return !isset($socket->getServer()->info[$socket->getFrame()->fd]);
+        return !isset($request->getServer()->info[$request->getFrame()->fd]);
     }
 
     //-------------------------------------------------
@@ -26,82 +26,82 @@ final class ChatService
 
     private array $users = [];
 
-    public function isUsed(Socket $socket, int $id): bool
+    public function isUsed(Request $request, int $id): bool
     {
         if (!isset($this->users[$id])) {
             return false;
         }
         $usedFd = $this->users[$id];
-        $selfFd = $socket->getFrame()->fd;
+        $selfFd = $request->getFrame()->fd;
         if ($usedFd === $selfFd) {
             return false;
         }
-        foreach ($socket->getServer()->connections as $fd) {
+        foreach ($request->getServer()->connections as $fd) {
             if ($fd === $usedFd) {
                 return true;
             }
         }
-        unset($socket->getServer()->info[$this->users[$id]]);
+        unset($request->getServer()->info[$this->users[$id]]);
         unset($this->users[$id]);
         return false;
     }
 
-    public function addUser(Socket $socket, array $info): void
+    public function addUser(Request $request, array $info): void
     {
-        $socket->getServer()->info[$socket->getFrame()->fd] = $info;
-        $this->users[$info['id']] = $socket->getFrame()->fd;
+        $request->getServer()->info[$request->getFrame()->fd] = $info;
+        $this->users[$info['id']] = $request->getFrame()->fd;
     }
 
-    public function getSelfInfo(Socket $socket): array
+    public function getSelfInfo(Request $request): array
     {
-        return $socket->getServer()->info[$socket->getFrame()->fd];
+        return $request->getServer()->info[$request->getFrame()->fd];
     }
 
-    public function removeUser(Socket $socket): void
+    public function removeUser(Request $request): void
     {
-        if (!$this->isGuest($socket)) {
-            unset($this->users[$this->getSelfInfo($socket)['id']]);
-            unset($socket->getServer()->info[$socket->getFrame()->fd]);
+        if (!$this->isGuest($request)) {
+            unset($this->users[$this->getSelfInfo($request)['id']]);
+            unset($request->getServer()->info[$request->getFrame()->fd]);
         }
     }
 
     /**
      * @return mixed
      */
-    public function getTarget(Socket $socket)
+    public function getTarget(Request $request)
     {
-        $self = $socket->getFrame()->fd;
-        foreach ($socket->getServer()->info as $fd => $info) {
+        $self = $request->getFrame()->fd;
+        foreach ($request->getServer()->info as $fd => $info) {
             if ($fd !== $self) {
-                if ($socket->isOnline($fd)) {
+                if ($request->isOnline($fd)) {
                     return $fd;
                 } else {
-                    unset($socket->getServer()->info[$fd]);
+                    unset($request->getServer()->info[$fd]);
                 }
             }
         }
         return null;
     }
 
-    public function sendTarget(Socket $socket, $data): void
+    public function sendTarget(Request $request, $data): void
     {
-        $target = $this->getTarget($socket);
+        $target = $this->getTarget($request);
         if ($target === null) {
-            $socket->emit([
+            $request->emit([
                 'type' => 'system',
                 'data' => '还没有目标'
             ]);
             return;
         }
 
-        if ($socket->isOnline($target)) {
-            $socket->emit([
+        if ($request->isOnline($target)) {
+            $request->emit([
                 'type' => 'msg',
                 'target' => 'target',
                 'data' => $data
             ], $target);
         } else {
-            $socket->emit([
+            $request->emit([
                 'type' => 'system',
                 'data' => '对方不在线'
             ]);
@@ -112,25 +112,25 @@ final class ChatService
     //                聊天室
     //-------------------------------------------------
 
-    public function enterRoom(Socket $socket, string $room): void
+    public function enterRoom(Request $request, string $room): void
     {
-        $socket->join($room);
+        $request->join($room);
 
-        $socket->emit([
+        $request->emit([
             'type' => 'system',
             'data' => '你进入了房间"' . $room . '"'
         ]);
     }
 
-    public function broadcast(Socket $socket, $data): void
+    public function broadcast(Request $request, $data): void
     {
-        if (!$socket->in($data['room'])) {
-            $socket->emit([
+        if (!$request->isIn($data['room'])) {
+            $request->emit([
                 'type' => 'system',
                 'data' => '你不在当前房间'
             ]);
         } else {
-            $socket->broadcast($data['room'], [
+            $request->broadcast($data['room'], [
                 'type' => 'msg',
                 'target' => 'target',
                 'data' => $data['text']

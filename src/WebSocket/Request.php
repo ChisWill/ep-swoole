@@ -7,7 +7,7 @@ namespace Ep\Swoole\WebSocket;
 use Swoole\WebSocket\Frame;
 use Swoole\WebSocket\Server;
 
-final class Socket
+final class Request
 {
     private Server $server;
     private Frame $frame;
@@ -47,7 +47,7 @@ final class Socket
         return $this;
     }
 
-    public function in(string $room, int $fd = null): bool
+    public function isIn(string $room, int $fd = null): bool
     {
         return $this->nsp->exists((string) ($fd ?? $this->frame->fd), $room);
     }

@@ -17,8 +17,8 @@ final class Factory
         $this->injector = $injector;
     }
 
-    public function createSocket(Server $server, Frame $frame): Socket
+    public function createRequest(Server $server, Frame $frame): Request
     {
-        return $this->injector->make(Socket::class, [$server, $frame]);
+        return $this->injector->make(Request::class, [$server, $frame]);
     }
 }
