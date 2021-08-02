@@ -44,7 +44,7 @@ class UserSocket extends Controller
             'id' => 1,
             'name' => 'a'
         ];
-        $request->emit($data);
+        $request->emit('msg', $data);
     }
 
     public function loginAction(Request $request)
@@ -90,7 +90,7 @@ class UserSocket extends Controller
 
     private function emit(Request $request, $data): void
     {
-        $request->emit([
+        $request->emit('msg', [
             'type' => 'system',
             'data' => $data
         ]);

@@ -87,7 +87,7 @@ final class ChatService
     {
         $target = $this->getTarget($request);
         if ($target === null) {
-            $request->emit([
+            $request->emit('msg', [
                 'type' => 'system',
                 'data' => '还没有目标'
             ]);
@@ -95,13 +95,13 @@ final class ChatService
         }
 
         if ($request->isOnline($target)) {
-            $request->emit([
+            $request->emit('msg', [
                 'type' => 'msg',
                 'target' => 'target',
                 'data' => $data
             ], $target);
         } else {
-            $request->emit([
+            $request->emit('msg', [
                 'type' => 'system',
                 'data' => '对方不在线'
             ]);
@@ -116,21 +116,21 @@ final class ChatService
     {
         $request->join($room);
 
-        $request->emit([
+        $request->emit('msg', [
             'type' => 'system',
             'data' => '你进入了房间"' . $room . '"'
         ]);
     }
 
-    public function broadcast(Request $request, $data): void
+    public function broadcast(string $event, Request $request, $data): void
     {
         if (!$request->isIn($data['room'])) {
-            $request->emit([
+            $request->emit($event, [
                 'type' => 'system',
                 'data' => '你不在当前房间'
             ]);
         } else {
-            $request->broadcast($data['room'], [
+            $request->broadcast($event, $data['room'], [
                 'type' => 'msg',
                 'target' => 'target',
                 'data' => $data['text']

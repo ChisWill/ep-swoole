@@ -74,6 +74,7 @@
 </div>
 
 <script>
+    let events = {};
     let websocket = new WebSocket('ws://127.0.0.1:9501');
     let display = function(data, type = 'center') {
         let date = new Date;
@@ -84,12 +85,15 @@
         $("#message-area .end")[0].scrollIntoView();
     }
 
-    websocket.emit = function(type, data = '') {
+    websocket.emit = function(event, data = '') {
         this.send(JSON.stringify([
-            type,
+            event,
             data
         ]));
     }
+    websocket.on = function(event, callback) {
+        events[event] = callback;
+    };
 
     websocket.onopen = function(evt) {
         display('Connected to WebSocket server.');
@@ -98,7 +102,13 @@
     websocket.onclose = function(evt) {};
 
     websocket.onmessage = function(evt) {
-        let data = JSON.parse(evt.data);
+        let response = JSON.parse(evt.data);
+        let event = response[0];
+        let data = response[1];
+        events[event](data);
+    };
+
+    websocket.on('msg', function(data) {
         switch (data['type']) {
             case 'msg':
                 if (data['target'] === 'self') {
@@ -113,7 +123,11 @@
                 display(data['data']);
                 break;
         }
-    };
+    });
+
+    websocket.on('error', function(data) {
+        alert('error' + data);
+    });
 
     $("#login-btn").click(function() {
         let id = $("#login-id").val();

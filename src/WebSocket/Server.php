@@ -67,7 +67,7 @@ final class Server implements ServerInterface
                 ->withControllerSuffix($this->config->webSocketSuffix)
                 ->run($handler, $request);
         } catch (Throwable $t) {
-            $request->emit($t->getMessage() . ' in ' . $t->getFile() . ':' . $t->getLine());
+            $request->emit('error', $t->getMessage() . ' in ' . $t->getFile() . ':' . $t->getLine());
         }
     }
 }

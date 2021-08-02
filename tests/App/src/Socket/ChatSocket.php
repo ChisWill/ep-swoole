@@ -33,12 +33,12 @@ class ChatSocket extends Controller
             return;
         }
 
-        $this->chatService->broadcast($request, $request->getData());
+        $this->chatService->broadcast('msg', $request, $request->getData());
     }
 
     private function emit(Request $request, $data, string $type = 'msg'): void
     {
-        $request->emit([
+        $request->emit('msg', [
             'type' => $type,
             'target' => 'target',
             'data' => $data

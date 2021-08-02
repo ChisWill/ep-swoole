@@ -55,9 +55,9 @@ final class Request
     /**
      * @param mixed $data
      */
-    public function emit($data, int $fd = null): self
+    public function emit(string $event, $data, int $fd = null): self
     {
-        $this->server->push($fd ?? $this->frame->fd, $this->encode($data));
+        $this->server->push($fd ?? $this->frame->fd, $this->encode([$event, $data]));
 
         return $this;
     }
@@ -65,7 +65,7 @@ final class Request
     /**
      * @param mixed $data
      */
-    public function broadcast(string $to, $data): self
+    public function broadcast(string $event, string $to, $data): self
     {
         if (!$this->nsp->exists($this->frame->fd, $to)) {
             return $this;
@@ -74,7 +74,7 @@ final class Request
         foreach ($this->nsp->connections($to) as $fd) {
             $fd = (int) $fd;
             if ($this->frame->fd !== $fd) {
-                $this->emit($data, $fd);
+                $this->emit($event, $data, $fd);
             }
         }
         return $this;

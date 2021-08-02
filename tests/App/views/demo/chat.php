@@ -69,6 +69,39 @@
 
 <script>
     let websocket = new WebSocket('ws://127.0.0.1:9501');
+    class EpWebSocket {
+        constructor(webSocket) {
+            this.webSocket = webSocket;
+            this.events = {};
+        }
+
+        onOpen(callback) {
+            this.webSocket.onopen = callback;
+        }
+
+        onClose(callback) {
+            this.webSocket.onclose = callback;
+        }
+
+        on(event, callback) {
+            this.events[event] = callback;
+        }
+
+        emit(event, data) {
+            this.webSocket.send(JSON.stringify([
+                event,
+                data
+            ]));
+        }
+
+        run() {
+            let self = this;
+            this.webSocket.onmessage = function(event) {
+                let response = JSON.parse(event.data);
+                self.events[response[0]](response[1]);
+            }
+        }
+    }
     let display = function(data, type = 'center') {
         let date = new Date;
         let msg = data + ' ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds();
@@ -77,22 +110,11 @@
         $("#message-area .end").before($msg);
         $("#message-area .end")[0].scrollIntoView();
     }
-
-    websocket.emit = function(type, data = '') {
-        this.send(JSON.stringify([
-            type,
-            data
-        ]));
-    }
-
-    websocket.onopen = function(evt) {
+    let ws = new EpWebSocket(websocket);
+    ws.onOpen(function(evt) {
         display('Connected to WebSocket server.');
-    };
-
-    websocket.onclose = function(evt) {};
-
-    websocket.onmessage = function(evt) {
-        let data = JSON.parse(evt.data);
+    });
+    ws.on('msg', function(data) {
         switch (data['type']) {
             case 'msg':
                 if (data['target'] === 'self') {
@@ -107,14 +129,15 @@
                 display(data['data']);
                 break;
         }
-    };
+    });
+    ws.run();
 
     $("#login-btn").click(function() {
         let id = $("#login-id").val();
         if (!id) {
             alert('Require Id');
         }
-        websocket.emit('user/login', id);
+        ws.emit('user/login', id);
     });
     $("#send-btn").click(function() {
         let text = $("#input-box").val();
@@ -122,6 +145,6 @@
             alert('Empty text');
         }
         display(text, 'right');
-        websocket.emit('chat/sendText', text);
+        ws.emit('chat/sendText', text);
     });
 </script>

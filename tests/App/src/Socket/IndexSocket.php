@@ -11,13 +11,13 @@ class IndexSocket extends Controller
 {
     public function before(Request $request): bool
     {
-        $request->emit('before');
+        $request->emit('msg', 'before');
         return true;
     }
 
     public function after(Request $request): void
     {
-        $request->emit('after');
+        $request->emit('msg', 'after');
     }
 
     public function indexAction(Request $request)
@@ -28,6 +28,6 @@ class IndexSocket extends Controller
             'route' => $request->getRoute(),
             'receive' => $request->getData(),
         ];
-        $request->emit($params);
+        $request->emit('msg', $params);
     }
 }
