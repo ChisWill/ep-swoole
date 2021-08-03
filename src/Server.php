@@ -35,9 +35,9 @@ final class Server
 
         $mainServer = $this->createMainServer();
 
-        $mainServer->init();
+        $mainServer->set($this->settings);
 
-        $mainServer->start($this->settings);
+        $mainServer->start();
     }
 
     private function createMainServer(): ServerInterface

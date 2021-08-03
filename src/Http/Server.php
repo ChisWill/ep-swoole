@@ -25,20 +25,20 @@ final class Server implements ServerInterface
 
     private Config $config;
     private WebApplication $webApplication;
-    private ServerRequestFactory $serverRequestFactory;
+    private PsrRequestFactory $psrRequestFactory;
     private ErrorRenderer $errorRenderer;
     private Service $service;
 
     public function __construct(
         Config $config,
         WebApplication $webApplication,
-        ServerRequestFactory $serverRequestFactory,
+        PsrRequestFactory $psrRequestFactory,
         ErrorRenderer $errorRenderer,
         Service $service
     ) {
         $this->config = $config;
         $this->webApplication = $webApplication;
-        $this->serverRequestFactory = $serverRequestFactory;
+        $this->psrRequestFactory = $psrRequestFactory;
         $this->errorRenderer = $errorRenderer;
         $this->service = $service;
     }
@@ -62,7 +62,7 @@ final class Server implements ServerInterface
     public function handleRequest(Request $swooleRequest, Response $swooleResponse): void
     {
         try {
-            $psrRequest = $this->serverRequestFactory->createFromSwooleRequest($swooleRequest);
+            $psrRequest = $this->psrRequestFactory->createFromSwooleRequest($swooleRequest);
 
             $this->emit(
                 $psrRequest,

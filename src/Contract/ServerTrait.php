@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ep\Swoole\Contract;
 
+use Ep;
 use Ep\Swoole\Config;
 use Ep\Swoole\SwooleEvent;
 use Swoole\Server;
@@ -19,60 +20,59 @@ trait ServerTrait
         $this->config = $config;
     }
 
-    private Server $server;
-
-    public function init(): void
-    {
-        $class = $this->getServerClass();
-
-        $this->server = new $class(
-            $this->config->host,
-            $this->config->port,
-            $this->config->mode,
-            $this->config->sockType
-        );
-
-        $this->onEvents($this->server, $this->config->events);
-
-        $this->listenServers($this->server, $this->config->servers);
-    }
+    private ?Server $server = null;
 
     public function getServer(): Server
     {
+        if ($this->server === null) {
+            $class = $this->getServerClass();
+
+            $this->server = new $class(
+                $this->config->host,
+                $this->config->port,
+                $this->config->mode,
+                $this->config->sockType
+            );
+
+            $this->bindEvent($this->server, $this->config->events);
+            $this->listenServer($this->server, $this->config->servers);
+        }
+
         return $this->server;
     }
 
-    public function start(array $settings): void
+    public function start(): void
     {
         $this->onRequest();
 
-        $this->server->set($settings);
+        $this->getServer()->start();
+    }
 
-        $this->server->start();
+    public function set(array $settings): void
+    {
+        $this->getServer()->set($settings);
     }
 
     /**
-     * @param Server|Port $port
+     * @param Server|Port $server
      */
-    private function onEvents($port, array $events): void
+    private function bindEvent($server, array $events): void
     {
         foreach ($events as $event => $callback) {
             if (!SwooleEvent::isSwooleEvent($event)) {
                 throw new InvalidArgumentException("The \"servers[events]\" configuration must have Swoole Event as the key of the array.");
             }
-            if (!is_callable($callback)) {
+            if (!is_callable($callback) && !is_array($callback)) {
                 throw new InvalidArgumentException("The \"servers[events]\" configuration is an array of string-callback pairs.");
             }
-            $port->on($event, $callback);
+            if (is_array($callback) && is_string(current($callback))) {
+                $callback = [Ep::getDi()->get(array_shift($callback)), array_shift($callback)];
+            }
+            $server->on($event, $callback);
         }
     }
 
-    /** 
-     * @var Port[] $ports 
-     */
-    private array $ports = [];
-
-    private function listenServers(Server $server, array $servers): void
+    private function listenServer(Server $server, array $servers): void
     {
         foreach ($servers as $config) {
             if (!isset($config['port'])) {
@@ -82,12 +82,11 @@ trait ServerTrait
             $port = $server->listen(
                 $config['host'],
                 $config['port'],
-                $config['socketType'] ?? SWOOLE_SOCK_TCP,
+                $config['sockType'] ?? SWOOLE_SOCK_TCP,
             );
             if ($port instanceof Port) {
                 $port->set($config['settings'] ?? []);
-                $this->onEvents($port, $config['events'] ?? []);
-                $this->ports[] = $port;
+                $this->bindEvent($port, $config['events'] ?? []);
             } else {
                 throw new InvalidArgumentException("Failed to listen server port [{$config['host']}:{$config['port']}]");
             }

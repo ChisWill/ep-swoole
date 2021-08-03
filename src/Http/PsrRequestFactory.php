@@ -16,7 +16,7 @@ use Psr\Http\Message\UriFactoryInterface;
 use Psr\Http\Message\UriInterface;
 use RuntimeException;
 
-final class ServerRequestFactory
+final class PsrRequestFactory
 {
     private ServerRequestFactoryInterface $serverRequestFactory;
     private UriFactoryInterface $uriFactory;
