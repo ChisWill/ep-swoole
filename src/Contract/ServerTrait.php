@@ -48,11 +48,6 @@ trait ServerTrait
         $this->getServer()->start();
     }
 
-    public function set(array $settings): void
-    {
-        $this->getServer()->set($settings);
-    }
-
     /**
      * @param Server|Port $server
      */
@@ -68,6 +63,7 @@ trait ServerTrait
             if (is_array($callback) && is_string(current($callback))) {
                 $callback = [Ep::getDi()->get(array_shift($callback)), array_shift($callback)];
             }
+
             $server->on($event, $callback);
         }
     }
@@ -78,18 +74,20 @@ trait ServerTrait
             if (!isset($config['port'])) {
                 throw new InvalidArgumentException("The \"servers[port]\" configuration is required.");
             }
+
             $config['host'] ??= '0.0.0.0';
             $port = $server->listen(
                 $config['host'],
                 $config['port'],
                 $config['sockType'] ?? SWOOLE_SOCK_TCP,
             );
-            if ($port instanceof Port) {
-                $port->set($config['settings'] ?? []);
-                $this->bindEvent($port, $config['events'] ?? []);
-            } else {
+            if (!$port instanceof Port) {
                 throw new InvalidArgumentException("Failed to listen server port [{$config['host']}:{$config['port']}]");
             }
+
+            $port->set($config['settings'] ?? []);
+
+            $this->bindEvent($port, $config['events'] ?? []);
         }
     }
 

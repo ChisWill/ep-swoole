@@ -35,7 +35,7 @@ final class Server
 
         $mainServer = $this->createMainServer();
 
-        $mainServer->set($this->settings);
+        $mainServer->getServer()->set($this->settings);
 
         $mainServer->start();
     }
