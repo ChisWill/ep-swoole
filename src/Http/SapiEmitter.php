@@ -36,11 +36,11 @@ final class SapiEmitter
             $this->response->setHeader($header, $values, false);
         }
 
-        if ($withoutBody) {
-            $this->response->end();
-        } else {
+        if (!$withoutBody) {
             $this->emitBody($response);
         }
+
+        $this->response->end();
     }
 
     private function emitBody(ResponseInterface $response): void
@@ -52,7 +52,6 @@ final class SapiEmitter
         while (!$body->eof()) {
             $this->response->write($body->read(2_097_152));
         }
-        $this->response->end();
     }
 
     private function shouldOutputBody(ResponseInterface $response): bool

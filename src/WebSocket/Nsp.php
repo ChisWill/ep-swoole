@@ -8,7 +8,7 @@ use Ep\Swoole\Contract\NspAdapterInterface;
 
 final class Nsp
 {
-    private const PREFIX_ROOM = 'Ep-WS-Room-';
+    public const PREFIX_ROOM = 'Ep-WS-Room-';
 
     private NspAdapterInterface $adapter;
 
