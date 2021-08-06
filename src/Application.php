@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ep\Swoole;
 
 use Ep\Console\Application as ConsoleApplication;
+use Ep\Swoole\Command\ReloadCommand;
 use Ep\Swoole\Command\StartCommand;
 use Ep\Swoole\Command\StopCommand;
 use Psr\Container\ContainerInterface;
@@ -13,7 +14,8 @@ final class Application
 {
     private const DEFAULT_COMMANDS = [
         StartCommand::class,
-        StopCommand::class
+        StopCommand::class,
+        ReloadCommand::class
     ];
 
     private ConsoleApplication $application;

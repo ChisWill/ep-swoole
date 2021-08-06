@@ -11,7 +11,8 @@ return [
     'port' => 9501,
     'type' => Server::WEBSOCKET,
     'settings' => [
-        'worker_num' => 1,
+        'worker_num' => 4,
+        'max_wait_time' => 10,
         'http_compression' => false
     ],
     'events' => [

@@ -7,6 +7,7 @@ namespace Ep\Swoole;
 use Ep\Contract\InjectorInterface;
 use Ep\Swoole\Contract\ServerInterface;
 use Ep\Swoole\Http\Server as HttpServer;
+use Ep\Swoole\Kit\SystemKit;
 use Ep\Swoole\Tcp\Server as TcpServer;
 use Ep\Swoole\WebSocket\Server as WebSocketServer;
 use Swoole\Runtime;
@@ -19,12 +20,18 @@ final class Server
     public const TCP = 3;
 
     private InjectorInterface $injector;
+    private SystemKit $systemKit;
     private Config $config;
     private array $settings;
 
-    public function __construct(InjectorInterface $injector, Config $config, array $settings)
-    {
+    public function __construct(
+        InjectorInterface $injector,
+        SystemKit $systemKit,
+        Config $config,
+        array $settings
+    ) {
         $this->injector = $injector;
+        $this->systemKit = $systemKit;
         $this->config = $config;
         $this->settings = $settings + $this->config->settings;
     }
@@ -35,7 +42,7 @@ final class Server
 
         $mainServer = $this->createMainServer();
 
-        $mainServer->getServer()->set($this->settings);
+        $mainServer->getServer()->set($this->getDefaultSettings() + $this->settings);
 
         $mainServer->start();
     }
@@ -52,5 +59,13 @@ final class Server
             default:
                 throw new InvalidArgumentException('The "type" configuration is invalid.');
         }
+    }
+
+    private function getDefaultSettings(): array
+    {
+        return [
+            'pid_file' => $this->systemKit->getPidFile(),
+            'reload_async' => true
+        ];
     }
 }

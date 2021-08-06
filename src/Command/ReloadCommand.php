@@ -9,13 +9,13 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-final class StopCommand extends Command
+final class ReloadCommand extends Command
 {
     private SystemKit $systemKit;
 
     public function __construct(SystemKit $systemKit)
     {
-        parent::__construct('stop');
+        parent::__construct('reload');
 
         $this->systemKit = $systemKit;
     }
@@ -25,7 +25,7 @@ final class StopCommand extends Command
      */
     protected function configure(): void
     {
-        $this->setDescription('Stop swoole server');
+        $this->setDescription('Reload swoole server');
     }
 
     /**
@@ -38,7 +38,7 @@ final class StopCommand extends Command
             return self::SUCCESS;
         }
 
-        exec('kill ' . file_get_contents($pidFile));
+        exec('kill -USR1 ' . file_get_contents($pidFile));
 
         return self::SUCCESS;
     }
