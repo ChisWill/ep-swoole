@@ -55,7 +55,7 @@ final class ErrorRenderer extends BaseErrorRenderer
             $context['route'] = $request->getRoute();
             $context['data'] = $request->getData();
 
-            $this->logger->error($this->render($t, $request), $context);
+            $this->logger->error(parent::render($t, $request), $context);
         }
     }
 }

@@ -9,6 +9,8 @@ use Yiisoft\Db\Redis\Connection;
 
 final class RedisAdapter implements NspAdapterInterface
 {
+    private const PREFIX = 'Ep-WS-Room-';
+
     private Connection $redis;
 
     public function __construct(Connection $redis)
@@ -21,7 +23,7 @@ final class RedisAdapter implements NspAdapterInterface
      */
     public function add(string $key, string $value): void
     {
-        $this->redis->sadd($key, $value);
+        $this->redis->sadd(self::PREFIX . $key, $value);
     }
 
     /**
@@ -29,7 +31,7 @@ final class RedisAdapter implements NspAdapterInterface
      */
     public function values(string $key): array
     {
-        return $this->redis->smembers($key);
+        return $this->redis->smembers(self::PREFIX . $key);
     }
 
     /**
@@ -37,7 +39,7 @@ final class RedisAdapter implements NspAdapterInterface
      */
     public function exists(string $key, string $value): bool
     {
-        return $this->redis->sismember($key, $value) > 0;
+        return $this->redis->sismember(self::PREFIX . $key, $value) > 0;
     }
 
     /**
@@ -45,6 +47,6 @@ final class RedisAdapter implements NspAdapterInterface
      */
     public function remove(string $key, string $value): void
     {
-        $this->redis->srem($key, $value);
+        $this->redis->srem(self::PREFIX . $key, $value);
     }
 }
