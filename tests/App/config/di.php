@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 use Ep\Base\Config;
 use Ep\Swoole\Contract\NspAdapterInterface;
+use Ep\Swoole\Contract\WebsocketErrorRendererInterface;
 use Ep\Swoole\WebSocket\NspAdapter\ArrayAdapter;
 use Ep\Swoole\WebSocket\NspAdapter\RedisAdapter;
+use Ep\Tests\App\Component\WebsocketErrorRenderer;
 use Psr\Log\LoggerInterface;
 use Yiisoft\Aliases\Aliases;
 use Yiisoft\Db\Connection\Connection;
@@ -28,6 +30,7 @@ return static fn (Config $config): array => [
         return $logger;
     },
     NspAdapterInterface::class => ArrayAdapter::class,
+    WebsocketErrorRendererInterface::class => WebsocketErrorRenderer::class,
     // Sqlite
     'sqlite' => [
         'class' => SqliteConnection::class,

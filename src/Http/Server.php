@@ -73,6 +73,7 @@ final class Server implements ServerInterface
                 $swooleResponse
             );
         } catch (Throwable $t) {
+            $this->errorRenderer->log($t, $psrRequest);
             $swooleResponse->end($this->errorRenderer->render($t, $psrRequest));
         }
     }

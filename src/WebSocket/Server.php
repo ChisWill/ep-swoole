@@ -26,19 +26,22 @@ final class Server implements ServerInterface
     private HttpServer $httpServer;
     private Route $route;
     private ControllerRunner $controllerRunner;
+    private ErrorRenderer $errorRenderer;
 
     public function __construct(
         Config $config,
         Factory $factory,
         HttpServer $httpServer,
         Route $route,
-        ControllerRunner $controllerRunner
+        ControllerRunner $controllerRunner,
+        ErrorRenderer $errorRenderer
     ) {
         $this->config = $config;
         $this->factory = $factory;
         $this->httpServer = $httpServer;
         $this->route = $route;
         $this->controllerRunner = $controllerRunner;
+        $this->errorRenderer = $errorRenderer;
     }
 
     /**
@@ -54,21 +57,24 @@ final class Server implements ServerInterface
      */
     protected function onRequest(): void
     {
-        $this->getServer()->on(SwooleEvent::ON_MESSAGE, fn (WebSocketServer $server, Frame $frame) => $this->handleMessage($this->factory->createRequest($server, $frame)));
+        $this->getServer()->on(SwooleEvent::ON_MESSAGE, [$this, 'handleMessage']);
 
         $this->getServer()->on(SwooleEvent::ON_REQUEST, [$this->httpServer, 'handleRequest']);
     }
 
-    private function handleMessage(Request $request): void
+    public function handleMessage(WebSocketServer $server, Frame $frame): void
     {
         try {
+            $request = $this->factory->createRequest($server, $frame);
+
             [, $handler] = $this->route->match($request->getRoute());
 
             $this->controllerRunner
                 ->withControllerSuffix($this->config->webSocketSuffix)
                 ->run($handler, $request);
         } catch (Throwable $t) {
-            $request->emit('error', $t->getMessage() . ' in ' . $t->getFile() . ':' . $t->getLine());
+            $this->errorRenderer->log($t, $request);
+            $this->errorRenderer->render($t, $request);
         }
     }
 }
