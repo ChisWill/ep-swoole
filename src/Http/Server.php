@@ -19,6 +19,9 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Throwable;
 
+/**
+ * @method HttpServer getServer()
+ */
 final class Server implements ServerInterface
 {
     use ServerTrait;

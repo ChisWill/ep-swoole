@@ -12,6 +12,7 @@ return [
     'type' => Server::WEBSOCKET,
     'settings' => [
         'worker_num' => 1,
+        'http_compression' => false
     ],
     'events' => [
         SwooleEvent::ON_OPEN => [WebSocketEvent::class, 'onOpen']
@@ -20,8 +21,7 @@ return [
         [
             'port' => 9502,
             'settings' => [
-                'open_http_protocol' => true,
-                'http_compression' => true,
+                'open_http_protocol' => true
             ]
         ]
     ]

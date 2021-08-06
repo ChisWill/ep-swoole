@@ -10,6 +10,9 @@ use Ep\Swoole\Contract\ServerTrait;
 use Ep\Swoole\SwooleEvent;
 use Swoole\Server as SwooleServer;
 
+/**
+ * @method SwooleServer getServer()
+ */
 class Server implements ServerInterface
 {
     use ServerTrait;
@@ -35,7 +38,7 @@ class Server implements ServerInterface
     protected function onRequest(): void
     {
         $this->getServer()->on(SwooleEvent::ON_RECEIVE, function (SwooleServer $server, int $fd, int $reactorId, string $data) {
-            echo "[#" . $server->worker_id . "]\tClient[$fd]: $data\n";
+            echo "[#" . $server->worker_id . "][@{$reactorId}]\tClient[$fd]: $data\n";
         });
     }
 }

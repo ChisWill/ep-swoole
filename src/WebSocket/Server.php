@@ -14,6 +14,9 @@ use Swoole\WebSocket\Frame;
 use Swoole\WebSocket\Server as WebSocketServer;
 use Throwable;
 
+/**
+ * @method WebSocketServer getServer()
+ */
 final class Server implements ServerInterface
 {
     use ServerTrait;
@@ -51,9 +54,7 @@ final class Server implements ServerInterface
      */
     protected function onRequest(): void
     {
-        $this->getServer()->on(SwooleEvent::ON_MESSAGE, function (WebSocketServer $server, Frame $frame): void {
-            $this->handleMessage($this->factory->createRequest($server, $frame));
-        });
+        $this->getServer()->on(SwooleEvent::ON_MESSAGE, fn (WebSocketServer $server, Frame $frame) => $this->handleMessage($this->factory->createRequest($server, $frame)));
 
         $this->getServer()->on(SwooleEvent::ON_REQUEST, [$this->httpServer, 'handleRequest']);
     }

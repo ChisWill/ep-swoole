@@ -65,13 +65,13 @@ final class Request
     /**
      * @param mixed $data
      */
-    public function broadcast(string $event, string $to, $data): self
+    public function broadcast(string $event, string $room, $data): self
     {
-        if (!$this->nsp->exists($this->frame->fd, $to)) {
+        if (!$this->nsp->exists($this->frame->fd, $room)) {
             return $this;
         }
 
-        foreach ($this->nsp->connections($to) as $fd) {
+        foreach ($this->nsp->connections($room) as $fd) {
             $fd = (int) $fd;
             if ($this->frame->fd !== $fd) {
                 $this->emit($event, $data, $fd);
