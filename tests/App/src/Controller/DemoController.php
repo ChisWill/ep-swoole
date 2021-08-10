@@ -12,11 +12,13 @@ use Ep\Web\ServerRequest;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
+use Swoole\Process;
 use Yiisoft\Aliases\Aliases;
 use Yiisoft\Cookies\Cookie;
 use Yiisoft\Cookies\CookieCollection;
 use Yiisoft\Db\Redis\Connection;
 use Yiisoft\Http\Method;
+use Yiisoft\Session\SessionInterface;
 
 class DemoController extends Controller
 {
@@ -231,6 +233,21 @@ class DemoController extends Controller
         $response = $response->withHeader('z1', 'v3');
 
         return $cookie->addToResponse($cookie2->addToResponse($response));
+    }
+
+    public function sessionAction(ServerRequest $request, SessionInterface $session)
+    {
+        $s = $request->getQueryParams()['s'] ?? '';
+        if ($s) {
+            sleep(10);
+        }
+
+        $r = $session->get('a');
+        if (!$r) {
+            $session->set('a', mt_rand(1, 100));
+        }
+
+        return $this->string($r);
     }
 
     public function testAction()
