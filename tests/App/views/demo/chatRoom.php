@@ -75,7 +75,7 @@
 
 <script>
     let events = {};
-    let websocket = new WebSocket('ws://127.0.0.1:9501/ab?token=a123');
+    let websocket = new WebSocket('ws://127.0.0.1:9501/ab?access-token=1');
     let display = function(data, type = 'center') {
         let date = new Date;
         let msg = data + ' ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds();

@@ -2,14 +2,20 @@
 
 declare(strict_types=1);
 
+use Ep\Auth\AuthRepository;
 use Ep\Base\Config;
+use Ep\Contract\InjectorInterface;
 use Ep\Swoole\Contract\NspAdapterInterface;
 use Ep\Swoole\Contract\WebsocketErrorRendererInterface;
 use Ep\Swoole\WebSocket\NspAdapter\ArrayAdapter;
 use Ep\Swoole\WebSocket\NspAdapter\RedisAdapter;
+use Ep\Tests\App\Component\IdentityRepository;
 use Ep\Tests\App\Component\WebsocketErrorRenderer;
 use Psr\Log\LoggerInterface;
 use Yiisoft\Aliases\Aliases;
+use Yiisoft\Auth\IdentityWithTokenRepositoryInterface;
+use Yiisoft\Auth\Method\HttpBearer;
+use Yiisoft\Auth\Method\QueryParameter;
 use Yiisoft\Db\Connection\Connection;
 use Yiisoft\Db\Mysql\Connection as MysqlConnection;
 use Yiisoft\Db\Redis\Connection as RedisConnection;
@@ -28,6 +34,13 @@ return static fn (Config $config): array => [
         $logger = new Logger([$fileTarget]);
         $logger->setFlushInterval(1);
         return $logger;
+    },
+    IdentityWithTokenRepositoryInterface::class => IdentityRepository::class,
+    AuthRepository::class => function (InjectorInterface $injector) {
+        /** @var AuthRepository */
+        $auth = $injector->make(AuthRepository::class);
+        $auth->setMethod(QueryParameter::class);
+        return $auth;
     },
     NspAdapterInterface::class => ArrayAdapter::class,
     WebsocketErrorRendererInterface::class => WebsocketErrorRenderer::class,

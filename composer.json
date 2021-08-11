@@ -8,8 +8,7 @@
     "require": {
         "php": ">=7.4",
         "ext-swoole": "^4.6",
-        "chiswill/ep": "dev-master",
-        "symfony/console": "^5.2"
+        "chiswill/ep": "dev-master"
     },
     "require-dev": {
         "swoole/ide-helper": "^4.6",
