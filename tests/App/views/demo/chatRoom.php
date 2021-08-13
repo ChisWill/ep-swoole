@@ -53,10 +53,10 @@
     <div class="end"></div>
 </div>
 
-<div id="login-area">
-    <input type="text" id="login-id" value="<?= $id ?>">
+<!-- <div id="login-area">
+    <input type="text" id="login-id" value="">
     <input type="button" id="login-btn" value="登录">
-</div>
+</div> -->
 
 <div id="hall-area">
     <input type="text" id="hall-id">
@@ -96,6 +96,7 @@
     };
 
     websocket.onopen = function(evt) {
+        websocket.emit('user/info');
         display('Connected to WebSocket server.');
     };
 
@@ -119,6 +120,13 @@
                     display(data['data'], 'left');
                 } else {
                     display($data['data']);
+                }
+                break;
+            case 'info':
+                if (data['isGuest']) {
+                    display('当前为匿名用户');
+                } else {
+                    display('当前登录用户ID：' + data['info']['id'] + '，用户名：' + data['info']['name']);
                 }
                 break;
             case 'system':

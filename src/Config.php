@@ -13,7 +13,7 @@ final class Config
      */
     public string $webSocketSuffix = 'Socket';
     /**
-     * 主服务基本配置项，仅支持异步服务端
+     * Main server config
      * 
      * @see https://wiki.swoole.com/#/server/methods?id=__construct
      */
@@ -22,23 +22,23 @@ final class Config
     public int $mode = SWOOLE_PROCESS;
     public int $sockType = SWOOLE_SOCK_TCP;
     /**
-     * 主服务类型
+     * Main server type
      */
     public int $type = Server::HTTP;
     /**
-     * 主服务配置
+     * Main server settings
      * 
      * @see https://wiki.swoole.com/#/server/setting
      */
     public array $settings = [];
     /**
-     * 主服务事件
+     * Main server events
      * 
      * @see https://wiki.swoole.com/#/server/events
      */
     public array $events = [];
     /**
-     * 子服务配置，除了不需要 `mode` 外，其它与主服务配置相同
+     * Sub server config which is same as main server config
      */
     public array $servers = [];
 

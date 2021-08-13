@@ -24,14 +24,26 @@ class WebSocketEvent
      */
     private AuthRepository $auth;
 
+    /**
+     * @Inject
+     */
+    private SocketFdRepository $socketFd;
+
     public function onOpen(Server $server, Request $request)
     {
+        $server->tokenType = '1';
         $psrRequest = $this->psrRequestFactory->createFromSwooleRequest($request);
         if ($psrRequest->getUri()->getPath() !== '/') {
-            $identity = $this->auth->findMethod(QueryParameter::class)->authenticate($psrRequest);
+            /** @var QueryParameter */
+            $method = $this->auth->findMethod(QueryParameter::class);
+            $identity = $method
+                ->withTokenType($server->tokenType)
+                ->authenticate($psrRequest);
             if (!$identity) {
                 $server->close($request->fd);
             } else {
+                $accessToken = $psrRequest->getQueryParams()['access-token'] ?? null;
+                $this->socketFd->update($request->fd, $identity->getId(), $accessToken);
                 echo $identity->getId();
             }
         }
@@ -45,5 +57,10 @@ class WebSocketEvent
 
     public function onWorkerStop(Server $server, int $workId)
     {
+    }
+
+    public function onClose(Server $server, int $fd)
+    {
+        echo $fd . ' close';
     }
 }

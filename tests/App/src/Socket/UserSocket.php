@@ -7,6 +7,7 @@ namespace Ep\Tests\App\Socket;
 use Ep\Annotation\Inject;
 use Ep\Swoole\WebSocket\Controller;
 use Ep\Swoole\WebSocket\Request;
+use Ep\Tests\App\Model\Student;
 use Ep\Tests\App\Service\ChatService;
 use Throwable;
 
@@ -44,6 +45,20 @@ class UserSocket extends Controller
             'id' => 1,
             'name' => 'a'
         ];
+        $request->emit('msg', $data);
+    }
+
+    public function infoAction(Request $request)
+    {
+        /** @var Student */
+        $identity = $request->getIdentity();
+        $data = [
+            'type' => 'info',
+            'isGuest' => !$identity,
+        ];
+        if ($identity) {
+            $data['info'] = $identity->getAttributes();
+        }
         $request->emit('msg', $data);
     }
 

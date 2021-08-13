@@ -4,23 +4,29 @@ declare(strict_types=1);
 
 namespace Ep\Swoole\WebSocket;
 
+use Ep\Swoole\Contract\SocketIdentityRepositoryInterface;
+use Yiisoft\Auth\IdentityInterface;
 use Swoole\WebSocket\Frame;
 use Swoole\WebSocket\Server;
+use LogicException;
 
 final class Request
 {
     private Server $server;
     private Frame $frame;
     private Nsp $nsp;
+    private ?SocketIdentityRepositoryInterface $socketIdentityRepository;
 
     public function __construct(
         Server $server,
         Frame $frame,
-        Nsp $nsp
+        Nsp $nsp,
+        SocketIdentityRepositoryInterface $socketIdentityRepository = null
     ) {
         $this->server = $server;
         $this->frame = $frame;
         $this->nsp = $nsp;
+        $this->socketIdentityRepository = $socketIdentityRepository;
     }
 
     public function getServer(): Server
@@ -33,33 +39,61 @@ final class Request
         return $this->frame;
     }
 
+    private bool $initIdentity = false;
+    private ?IdentityInterface $identity = null;
+
+    public function getIdentity(): ?IdentityInterface
+    {
+        if ($this->initIdentity === false) {
+            $this->initIdentity = true;
+            if ($this->socketIdentityRepository !== null && ($token = $this->socketIdentityRepository->findToken($this->frame->fd)) !== null) {
+                $this->identity = $this->socketIdentityRepository->findIdentityByToken($token, $this->server->tokenType ?? null);
+            }
+        }
+        return $this->identity;
+    }
+
+    public function isGuest(): bool
+    {
+        return $this->getIdentity() === null;
+    }
+
+    public function getId(): ?string
+    {
+        return $this->isGuest() ? null : $this->identity->getId();
+    }
+
+    public function getFd(string $id)
+    {
+    }
+
     public function join(string $room): self
     {
-        $this->nsp->join($this->frame->fd, $room);
-
+        $id = $this->getId();
+        if ($id === null) {
+            $this->unauthorize();
+        }
+        $this->nsp->join($id, $room);
         return $this;
     }
 
     public function leave(string $room): self
     {
-        $this->nsp->leave($this->frame->fd, $room);
-
+        $id = $this->getId();
+        if ($id === null) {
+            $this->unauthorize();
+        }
+        $this->nsp->leave($id, $room);
         return $this;
     }
 
-    public function isIn(string $room, int $fd = null): bool
+    public function isIn(string $room, string $id = null): bool
     {
-        return $this->nsp->exists((string) ($fd ?? $this->frame->fd), $room);
-    }
-
-    /**
-     * @param mixed $data
-     */
-    public function emit(string $event, $data, int $fd = null): self
-    {
-        $this->server->push($fd ?? $this->frame->fd, $this->encode([$event, $data]));
-
-        return $this;
+        $id ??= $this->getId();
+        if ($id === null) {
+            return false;
+        }
+        return $this->nsp->exists($id, $room);
     }
 
     /**
@@ -67,7 +101,12 @@ final class Request
      */
     public function broadcast(string $event, string $room, $data): self
     {
-        if (!$this->nsp->exists($this->frame->fd, $room)) {
+        $id = $this->getId();
+        if ($id) {
+            return $this;
+        }
+
+        if (!$this->nsp->exists($id, $room)) {
             return $this;
         }
 
@@ -80,9 +119,23 @@ final class Request
         return $this;
     }
 
-    public function isOnline(int $fd = null): bool
+    /**
+     * @param mixed $data
+     */
+    public function emit(string $event, $data, int $fd = null): self
     {
-        return $this->server->isEstablished($fd ?? $this->frame->fd);
+        $this->server->push($fd ?? $this->frame->fd, $this->encode([$event, $data]));
+
+        return $this;
+    }
+
+    public function isOnline(string $id = null): bool
+    {
+        $fd = $id === null ? $this->frame->fd : $this->socketIdentityRepository->findFd($id);
+        if ($fd === null) {
+            return false;
+        }
+        return $this->server->isEstablished($fd);
     }
 
     private string $route;
@@ -128,5 +181,10 @@ final class Request
     private function encode($data): string
     {
         return json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    }
+
+    private function unauthorize(): void
+    {
+        throw new LogicException('No definition found for ' . SocketIdentityRepositoryInterface::class . '.');
     }
 }

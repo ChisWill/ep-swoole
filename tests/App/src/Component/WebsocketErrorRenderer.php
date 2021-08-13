@@ -18,6 +18,8 @@ class WebsocketErrorRenderer implements WebsocketErrorRendererInterface
 
     public function log(Throwable $t, Request $request): void
     {
-        Ep::getLogger()->emergency($t->getMessage());
+        Ep::getLogger()->emergency($t->getMessage(), [
+            'detail' => $t->getTraceAsString()
+        ]);
     }
 }

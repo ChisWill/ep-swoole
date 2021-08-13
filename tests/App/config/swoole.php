@@ -19,6 +19,7 @@ return [
         SwooleEvent::ON_OPEN => [WebSocketEvent::class, 'onOpen'],
         SwooleEvent::ON_WORKER_START => [WebSocketEvent::class, 'onWorkerStart'],
         SwooleEvent::ON_WORKER_STOP => [WebSocketEvent::class, 'onWorkerStop'],
+        SwooleEvent::ON_CLOSE => [WebSocketEvent::class, 'onClose']
     ],
     'servers' => [
         [

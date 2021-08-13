@@ -15,22 +15,16 @@ final class Nsp
         $this->adapter = $adapter;
     }
 
-    /**
-     * @param int|string $id
-     */
-    public function join($id, string $room): self
+    public function join(string $id, string $room): self
     {
-        $this->adapter->add($room, (string) $id);
+        $this->adapter->add($room, $id);
 
         return $this;
     }
 
-    /**
-     * @param int|string $id
-     */
-    public function exists($id, string $room): bool
+    public function exists(string $id, string $room): bool
     {
-        return $this->adapter->exists($room, (string) $id);
+        return $this->adapter->exists($room, $id);
     }
 
     public function connections(string $room): array
@@ -38,12 +32,9 @@ final class Nsp
         return $this->adapter->values($room);
     }
 
-    /**
-     * @param int|string $id
-     */
-    public function leave($id, string $room): self
+    public function leave(string $id, string $room): self
     {
-        $this->adapter->remove($room, (string) $id);
+        $this->adapter->remove($room, $id);
 
         return $this;
     }

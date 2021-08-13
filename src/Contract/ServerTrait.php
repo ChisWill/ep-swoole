@@ -35,7 +35,7 @@ trait ServerTrait
             );
 
             $this->bindEvent($this->server, $this->config->events);
-            $this->listenServer($this->server, $this->config->servers);
+            $this->createSubServer($this->server, $this->config->servers);
         }
 
         return $this->server;
@@ -68,7 +68,7 @@ trait ServerTrait
         }
     }
 
-    private function listenServer(Server $server, array $servers): void
+    private function createSubServer(Server $server, array $servers): void
     {
         foreach ($servers as $config) {
             if (!isset($config['port'])) {
@@ -84,7 +84,6 @@ trait ServerTrait
             if (!$port instanceof Port) {
                 throw new InvalidArgumentException("Failed to listen server port [{$config['host']}:{$config['port']}]");
             }
-
             $port->set($config['settings'] ?? []);
 
             $this->bindEvent($port, $config['events'] ?? []);

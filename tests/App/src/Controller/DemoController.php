@@ -182,22 +182,22 @@ class DemoController extends Controller
 
     public function chatAction(ServerRequest $request)
     {
-        $this->getView()->layout = 'chat';
+        $view = $this->getView()->withLayout('chat');
         $this->title = 'Simple Chat Room';
 
         $id = $request->getQueryParams()['id'] ?? '';
 
-        return $this->render('chat', compact('id'));
+        return $this->string($view->render('chat', compact('id')));
     }
 
     public function chatRoomAction(ServerRequest $request)
     {
-        $this->getView()->layout = 'chat';
+        $view = $this->getView()->withLayout('chat');
         $this->title = 'Chat Room';
 
         $id = $request->getQueryParams()['id'] ?? '';
 
-        return $this->render('chatRoom', compact('id'));
+        return $this->string($view->render('chatRoom', compact('id')));
     }
 
     public function socketioAction()
