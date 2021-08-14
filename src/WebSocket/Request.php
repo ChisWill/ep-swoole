@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Ep\Swoole\WebSocket;
 
-use Ep\Swoole\Contract\SocketIdentityRepositoryInterface;
+use Ep\Swoole\Contract\WebSocketIdentityRepositoryInterface;
 use Yiisoft\Auth\IdentityInterface;
 use Swoole\WebSocket\Frame;
 use Swoole\WebSocket\Server;
@@ -15,13 +15,13 @@ final class Request
     private Server $server;
     private Frame $frame;
     private Nsp $nsp;
-    private ?SocketIdentityRepositoryInterface $socketIdentityRepository;
+    private ?WebSocketIdentityRepositoryInterface $socketIdentityRepository;
 
     public function __construct(
         Server $server,
         Frame $frame,
         Nsp $nsp,
-        SocketIdentityRepositoryInterface $socketIdentityRepository = null
+        WebSocketIdentityRepositoryInterface $socketIdentityRepository = null
     ) {
         $this->server = $server;
         $this->frame = $frame;
@@ -46,8 +46,8 @@ final class Request
     {
         if ($this->initIdentity === false) {
             $this->initIdentity = true;
-            if ($this->socketIdentityRepository !== null && ($token = $this->socketIdentityRepository->findToken($this->frame->fd)) !== null) {
-                $this->identity = $this->socketIdentityRepository->findIdentityByToken($token, $this->server->tokenType ?? null);
+            if ($this->socketIdentityRepository !== null) {
+                $this->identity = $this->socketIdentityRepository->findIdentity($this->frame->fd);
             }
         }
         return $this->identity;
@@ -100,29 +100,6 @@ final class Request
 
     /**
      * @param mixed $data
-     * 
-     * @throws LogicException
-     */
-    public function broadcast(string $event, string $room, $data): self
-    {
-        $id = $this->getId();
-        if (!$id) {
-            $this->unauthorize();
-        }
-        if (!$this->isIn($room)) {
-            throw new LogicException('Not in room.');
-        }
-
-        foreach ($this->nsp->connections($room) as $targetId) {
-            if ($targetId !== $id) {
-                $this->send($event, $targetId, $data);
-            }
-        }
-        return $this;
-    }
-
-    /**
-     * @param mixed $data
      */
     public function emit(string $event, $data): void
     {
@@ -136,8 +113,29 @@ final class Request
      */
     public function send(string $event, string $id, $data): void
     {
-        if ($fd = $this->socketIdentityRepository->findFd($id)) {
+        if (($fd = $this->socketIdentityRepository->findFd($id)) !== null) {
             $this->server->push($fd, $this->encode([$event, $data]));
+        }
+    }
+
+    /**
+     * @param mixed $data
+     * 
+     * @throws LogicException
+     */
+    public function broadcast(string $event, string $room, $data): void
+    {
+        if (($id = $this->getId()) === null) {
+            $this->unauthorize();
+        }
+        if (!$this->isIn($room)) {
+            throw new LogicException('Not in room.');
+        }
+
+        foreach ($this->nsp->connections($room) as $targetId) {
+            if ($targetId !== $id) {
+                $this->send($event, $targetId, $data);
+            }
         }
     }
 
@@ -196,7 +194,7 @@ final class Request
     private function unauthorize(): void
     {
         if ($this->socketIdentityRepository === null) {
-            throw new LogicException('No definition found for ' . SocketIdentityRepositoryInterface::class . '.');
+            throw new LogicException('No definition found for ' . WebSocketIdentityRepositoryInterface::class . '.');
         } else {
             throw new LogicException('No login.');
         }

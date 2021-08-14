@@ -5,13 +5,10 @@ declare(strict_types=1);
 namespace Ep\Tests\App\Component;
 
 use Ep\Annotation\Inject;
-use Ep\Auth\AuthRepository;
 use Ep\Swoole\Http\PsrRequestFactory;
 use Swoole\Http\Request;
-use Swoole\Process;
 use Swoole\Timer;
 use Swoole\WebSocket\Server;
-use Yiisoft\Auth\Method\QueryParameter;
 
 class WebSocketEvent
 {
@@ -19,32 +16,22 @@ class WebSocketEvent
      * @Inject
      */
     private PsrRequestFactory $psrRequestFactory;
-
     /**
      * @Inject
      */
-    private AuthRepository $auth;
-
-    /**
-     * @Inject
-     */
-    private SocketFdRepository $socketFd;
+    private AuthMethod $auth;
 
     public function onOpen(Server $server, Request $request)
     {
-        $server->tokenType = '1';
         $psrRequest = $this->psrRequestFactory->createFromSwooleRequest($request);
         if ($psrRequest->getUri()->getPath() !== '/') {
-            /** @var QueryParameter */
-            $method = $this->auth->findMethod(QueryParameter::class);
-            $identity = $method
-                ->withTokenType($server->tokenType)
+            $identity = $this->auth
+                ->withFd($request->fd)
+                ->withTokenType('1')
                 ->authenticate($psrRequest);
-            if (!$identity || !$identity->getId()) {
+            if (!$identity) {
                 $server->close($request->fd);
             } else {
-                $accessToken = $psrRequest->getQueryParams()['access-token'] ?? null;
-                $this->socketFd->update($request->fd, $identity->getId(), $accessToken);
                 echo $identity->getId();
             }
         }

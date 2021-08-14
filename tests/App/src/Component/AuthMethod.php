@@ -4,19 +4,20 @@ declare(strict_types=1);
 
 namespace Ep\Tests\App\Component;
 
+use Ep\Swoole\WebSocket\Authentication;
 use Ep\Annotation\Inject;
 use Yiisoft\Db\Redis\Connection;
 
-final class SocketFdRepository
+class AuthMethod extends Authentication
 {
     /**
      * @Inject
      */
     private Connection $redis;
 
-    public function update(int $fd, ?string $id, ?string $token): void
+    protected function bind(int $fd, string $id): void
     {
-        $this->redis->hset('websocket-user-fd', $fd, $token);
+        $this->redis->hset('websocket-user-fd', $fd, $id);
         $oldFd = $this->redis->hget('websocket-user-id', $id);
         $this->redis->hset('websocket-user-id', $id, $fd);
         if ($oldFd) {

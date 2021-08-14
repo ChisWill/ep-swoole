@@ -6,12 +6,12 @@ namespace Ep\Tests\App\Component;
 
 use Ep;
 use Ep\Annotation\Inject;
-use Ep\Swoole\Contract\SocketIdentityRepositoryInterface;
+use Ep\Swoole\Contract\WebSocketIdentityRepositoryInterface;
 use Ep\Tests\App\Model\Student;
 use Yiisoft\Auth\IdentityInterface;
 use Yiisoft\Db\Redis\Connection;
 
-final class IdentityRepository implements SocketIdentityRepositoryInterface
+final class IdentityRepository implements WebSocketIdentityRepositoryInterface
 {
     /**
      * @Inject
@@ -23,9 +23,14 @@ final class IdentityRepository implements SocketIdentityRepositoryInterface
         return (int) $this->redis->hget('websocket-user-id', $id) ?: null;
     }
 
-    public function findToken(int $fd): ?string
+    public function findIdentity(int $fd): ?IdentityInterface
     {
-        return $this->redis->hget('websocket-user-fd', $fd) ?: null;
+        $id = $this->redis->hget('websocket-user-fd', $fd) ?: null;
+        return Student::find(Ep::getDb('sqlite'))
+            ->where([
+                'id' => $id
+            ])
+            ->one();
     }
 
     public function findIdentityByToken(string $token, ?string $type = null): ?IdentityInterface
