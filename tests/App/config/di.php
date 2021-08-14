@@ -6,6 +6,7 @@ use Ep\Auth\AuthRepository;
 use Ep\Base\Config;
 use Ep\Contract\InjectorInterface;
 use Ep\Swoole\Contract\NspAdapterInterface;
+use Ep\Swoole\Contract\SocketIdentityRepositoryInterface;
 use Ep\Swoole\Contract\WebsocketErrorRendererInterface;
 use Ep\Swoole\WebSocket\NspAdapter\ArrayAdapter;
 use Ep\Swoole\WebSocket\NspAdapter\RedisAdapter;
@@ -13,7 +14,6 @@ use Ep\Tests\App\Component\IdentityRepository;
 use Ep\Tests\App\Component\WebsocketErrorRenderer;
 use Psr\Log\LoggerInterface;
 use Yiisoft\Aliases\Aliases;
-use Yiisoft\Auth\IdentityWithTokenRepositoryInterface;
 use Yiisoft\Auth\Method\HttpBearer;
 use Yiisoft\Auth\Method\QueryParameter;
 use Yiisoft\Db\Connection\Connection;
@@ -35,14 +35,14 @@ return static fn (Config $config): array => [
         $logger->setFlushInterval(1);
         return $logger;
     },
-    IdentityWithTokenRepositoryInterface::class => IdentityRepository::class,
+    SocketIdentityRepositoryInterface::class => IdentityRepository::class,
     AuthRepository::class => function (InjectorInterface $injector) {
         /** @var AuthRepository */
         $auth = $injector->make(AuthRepository::class);
-        $auth->setMethod(QueryParameter::class);
+        $auth->setMethod(QueryParameter::class, new QueryParameter(new IdentityRepository()));
         return $auth;
     },
-    NspAdapterInterface::class => ArrayAdapter::class,
+    NspAdapterInterface::class => RedisAdapter::class,
     WebsocketErrorRendererInterface::class => WebsocketErrorRenderer::class,
     // Sqlite
     'sqlite' => [

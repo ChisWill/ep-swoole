@@ -63,57 +63,59 @@ final class Request
         return $this->isGuest() ? null : $this->identity->getId();
     }
 
-    public function getFd(string $id)
-    {
-    }
-
+    /**
+     * @throws LogicException
+     */
     public function join(string $room): self
     {
-        $id = $this->getId();
-        if ($id === null) {
+        if (($id = $this->getId()) === null) {
             $this->unauthorize();
         }
+
         $this->nsp->join($id, $room);
+
         return $this;
     }
 
+    /**
+     * @throws LogicException
+     */
     public function leave(string $room): self
     {
-        $id = $this->getId();
-        if ($id === null) {
+        if (($id = $this->getId()) === null) {
             $this->unauthorize();
         }
+
         $this->nsp->leave($id, $room);
+
         return $this;
     }
 
     public function isIn(string $room, string $id = null): bool
     {
         $id ??= $this->getId();
-        if ($id === null) {
-            return false;
-        }
-        return $this->nsp->exists($id, $room);
+
+        return $id === null ? false : $this->nsp->exists($id, $room);
     }
 
     /**
      * @param mixed $data
+     * 
+     * @throws LogicException
      */
     public function broadcast(string $event, string $room, $data): self
     {
         $id = $this->getId();
-        if ($id) {
-            return $this;
+        if (!$id) {
+            $this->unauthorize();
+        }
+        if (!$this->isIn($room)) {
+            throw new LogicException('Not in room.');
         }
 
-        if (!$this->nsp->exists($id, $room)) {
-            return $this;
-        }
-
-        foreach ($this->nsp->connections($room) as $fd) {
-            $fd = (int) $fd;
-            if ($this->frame->fd !== $fd) {
-                $this->emit($event, $data, $fd);
+        foreach ($this->nsp->connections($room) as $targetId) {
+            if ($targetId !== $id) {
+                $this->send($event, $targetId, $data);
             }
         }
         return $this;
@@ -122,23 +124,31 @@ final class Request
     /**
      * @param mixed $data
      */
-    public function emit(string $event, $data, int $fd = null): self
+    public function emit(string $event, $data): void
     {
-        $this->server->push($fd ?? $this->frame->fd, $this->encode([$event, $data]));
+        $this->server->push($this->frame->fd, $this->encode([$event, $data]));
+    }
 
-        return $this;
+    /**
+     * @param mixed $data
+     * 
+     * @throws LogicException
+     */
+    public function send(string $event, string $id, $data): void
+    {
+        if ($fd = $this->socketIdentityRepository->findFd($id)) {
+            $this->server->push($fd, $this->encode([$event, $data]));
+        }
     }
 
     public function isOnline(string $id = null): bool
     {
         $fd = $id === null ? $this->frame->fd : $this->socketIdentityRepository->findFd($id);
-        if ($fd === null) {
-            return false;
-        }
-        return $this->server->isEstablished($fd);
+
+        return $fd === null ? false : $this->server->isEstablished($fd);
     }
 
-    private string $route;
+    private ?string $route = null;
 
     public function getRoute(): string
     {
@@ -150,7 +160,7 @@ final class Request
     /**
      * @var mixed
      */
-    private $data = null;
+    private $data;
 
     /**
      * @return mixed
@@ -164,7 +174,7 @@ final class Request
 
     private function parseData(): void
     {
-        if ($this->data === null) {
+        if ($this->route === null) {
             $frameData = json_decode($this->frame->data, true);
             if (is_array($frameData) && count($frameData) >= 2) {
                 [$this->route, $this->data] = $frameData;
@@ -185,6 +195,10 @@ final class Request
 
     private function unauthorize(): void
     {
-        throw new LogicException('No definition found for ' . SocketIdentityRepositoryInterface::class . '.');
+        if ($this->socketIdentityRepository === null) {
+            throw new LogicException('No definition found for ' . SocketIdentityRepositoryInterface::class . '.');
+        } else {
+            throw new LogicException('No login.');
+        }
     }
 }

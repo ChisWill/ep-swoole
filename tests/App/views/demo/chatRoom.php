@@ -59,7 +59,7 @@
 </div> -->
 
 <div id="hall-area">
-    <input type="text" id="hall-id">
+    <input type="text" id="hall-id" value="a">
     <input type="button" id="hall-btn" value="进入房间">
 </div>
 
@@ -75,7 +75,7 @@
 
 <script>
     let events = {};
-    let websocket = new WebSocket('ws://127.0.0.1:9501/ab?access-token=1');
+    let websocket = new WebSocket('ws://127.0.0.1:9501/ab?access-token=<?= base64_encode(json_encode('A' . ($_GET['u'] ?? 1))) ?>');
     let display = function(data, type = 'center') {
         let date = new Date;
         let msg = data + ' ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds();
@@ -96,8 +96,10 @@
     };
 
     websocket.onopen = function(evt) {
-        websocket.emit('user/info');
         display('Connected to WebSocket server.');
+        setTimeout(function() {
+            websocket.emit('user/info');
+        }, 100);
     };
 
     websocket.onclose = function(evt) {

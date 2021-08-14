@@ -8,6 +8,7 @@ use Ep\Annotation\Inject;
 use Ep\Auth\AuthRepository;
 use Ep\Swoole\Http\PsrRequestFactory;
 use Swoole\Http\Request;
+use Swoole\Process;
 use Swoole\Timer;
 use Swoole\WebSocket\Server;
 use Yiisoft\Auth\Method\QueryParameter;
@@ -39,7 +40,7 @@ class WebSocketEvent
             $identity = $method
                 ->withTokenType($server->tokenType)
                 ->authenticate($psrRequest);
-            if (!$identity) {
+            if (!$identity || !$identity->getId()) {
                 $server->close($request->fd);
             } else {
                 $accessToken = $psrRequest->getQueryParams()['access-token'] ?? null;

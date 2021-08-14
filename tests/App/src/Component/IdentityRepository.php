@@ -30,9 +30,10 @@ final class IdentityRepository implements SocketIdentityRepositoryInterface
 
     public function findIdentityByToken(string $token, ?string $type = null): ?IdentityInterface
     {
+        $id = trim(json_decode(base64_decode($token)), 'A');
         return Student::find(Ep::getDb('sqlite'))
             ->where([
-                'id' => $token,
+                'id' => $id,
                 'class_id' => $type
             ])
             ->one();

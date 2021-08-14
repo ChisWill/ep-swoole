@@ -8,16 +8,9 @@ use Ep\Swoole\WebSocket\Request;
 
 final class ChatService
 {
-    private function init(Request $request)
-    {
-        $request->getServer()->info ??= [];
-    }
-
     public function isGuest(Request $request): bool
     {
-        $this->init($request);
-
-        return !isset($request->getServer()->info[$request->getFrame()->fd]);
+        return $request->isGuest();
     }
 
     //-------------------------------------------------
