@@ -58,7 +58,7 @@ final class Config
     /**
      * @param mixed $value
      */
-    public function __set(string $name, $value)
+    public function __set(string $name, $value): void
     {
         throw new InvalidArgumentException("The \"{$name}\" configuration is invalid.");
     }

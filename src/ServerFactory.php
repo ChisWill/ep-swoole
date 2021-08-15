@@ -15,9 +15,9 @@ use InvalidArgumentException;
 
 final class ServerFactory
 {
-    public const HTTP = 1;
-    public const WEBSOCKET = 2;
-    public const TCP = 3;
+    public const TCP = 1;
+    public const HTTP = 2;
+    public const WEBSOCKET = 3;
 
     private InjectorInterface $injector;
     private SystemKit $systemKit;
@@ -52,12 +52,12 @@ final class ServerFactory
     private function createMainServer(): ServerInterface
     {
         switch ($this->config->type) {
+            case self::TCP:
+                return $this->injector->make(TcpServer::class, [$this->config]);
             case self::HTTP:
                 return $this->injector->make(HttpServer::class, [$this->config]);
             case self::WEBSOCKET:
                 return $this->injector->make(WebSocketServer::class, [$this->config]);
-            case self::TCP:
-                return $this->injector->make(TcpServer::class, [$this->config]);
             default:
                 throw new InvalidArgumentException('The "type" configuration is invalid.');
         }
