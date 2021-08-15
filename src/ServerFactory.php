@@ -10,10 +10,10 @@ use Ep\Swoole\Http\Server as HttpServer;
 use Ep\Swoole\Kit\SystemKit;
 use Ep\Swoole\Tcp\Server as TcpServer;
 use Ep\Swoole\WebSocket\Server as WebSocketServer;
-use Swoole\Runtime;
+use Swoole\Coroutine;
 use InvalidArgumentException;
 
-final class Server
+final class ServerFactory
 {
     public const HTTP = 1;
     public const WEBSOCKET = 2;
@@ -36,15 +36,17 @@ final class Server
         $this->settings = $settings + $this->config->settings;
     }
 
-    public function run(): void
+    public function create(): ServerInterface
     {
-        Runtime::enableCoroutine(true, SWOOLE_HOOK_ALL);
+        Coroutine::set(array_merge([
+            'hook_flags' => SWOOLE_HOOK_ALL
+        ], $this->config->coroutineOptions));
 
         $mainServer = $this->createMainServer();
 
         $mainServer->getServer()->set($this->getDefaultSettings() + $this->settings);
 
-        $mainServer->start();
+        return $mainServer;
     }
 
     private function createMainServer(): ServerInterface

@@ -13,6 +13,12 @@ final class Config
      */
     public string $webSocketSuffix = 'Socket';
     /**
+     * Coroutine options
+     * 
+     * @see https://wiki.swoole.com/#/coroutine/coroutine?id=set
+     */
+    public array $coroutineOptions = [];
+    /**
      * Main server config
      * 
      * @see https://wiki.swoole.com/#/server/methods?id=__construct
@@ -24,7 +30,7 @@ final class Config
     /**
      * Main server type
      */
-    public int $type = Server::HTTP;
+    public int $type = ServerFactory::HTTP;
     /**
      * Main server settings
      * 

@@ -6,7 +6,7 @@ namespace Ep\Swoole\Command;
 
 use Ep\Contract\InjectorInterface;
 use Ep\Swoole\Config;
-use Ep\Swoole\Server;
+use Ep\Swoole\ServerFactory;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -41,11 +41,12 @@ final class StartCommand extends Command
         $settings['daemonize'] = $input->getOption('daemonize');
 
         $this->injector
-            ->make(Server::class, [
+            ->make(ServerFactory::class, [
                 'config' => $this->config,
                 'settings' => $settings
             ])
-            ->run();
+            ->create()
+            ->start();
 
         return self::SUCCESS;
     }

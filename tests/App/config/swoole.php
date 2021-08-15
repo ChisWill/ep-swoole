@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-use Ep\Swoole\Server;
+use Ep\Swoole\ServerFactory;
 use Ep\Swoole\SwooleEvent;
 use Ep\Tests\App\Component\WebSocketEvent;
 
 return [
     'host' => '0.0.0.0',
     'port' => 9501,
-    'type' => Server::WEBSOCKET,
+    'type' => ServerFactory::WEBSOCKET,
     'settings' => [
         'worker_num' => 4,
         'task_worker_num' => 1,
