@@ -1,3 +1,6 @@
+<?php
+
+use Ep\Helper\Str; ?>
 <style type="text/css">
     #message-area {
         border: 1px solid red;
@@ -40,6 +43,7 @@
     }
 
     #login-area,
+    #push-area,
     #hall-area {
         margin: 10px;
         text-align: center;
@@ -57,6 +61,12 @@
     <input type="text" id="login-id" value="">
     <input type="button" id="login-btn" value="登录">
 </div> -->
+
+<div id="push-area">
+    <input type="text" id="push-id" value="<?= (($_GET['u'] ?? 1) - 3) * -1 ?>" placeholder="id">
+    <input type="text" id="push-content" value="<?= Str::random() ?>" placeholder="content">
+    <input type="button" id="push-btn" value="推送">
+</div>
 
 <div id="hall-area">
     <input type="text" id="hall-id" value="a">
@@ -148,6 +158,18 @@
             return;
         }
         websocket.emit('user/login', id);
+    });
+    $("#push-btn").click(function() {
+        let id = $("#push-id").val();
+        let content = $("#push-content").val();
+        if (!id || !content) {
+            alert('Require id or content');
+            return;
+        }
+        websocket.emit('chat/push', {
+            id: id,
+            content: content
+        });
     });
     $("#hall-btn").click(function() {
         let room = $("#hall-id").val();

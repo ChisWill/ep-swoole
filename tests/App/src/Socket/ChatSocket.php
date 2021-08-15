@@ -36,6 +36,41 @@ class ChatSocket extends Controller
         $this->chatService->broadcast('msg', $request, $request->getData());
     }
 
+    public function pushAction(Request $request)
+    {
+        if ($this->chatService->isGuest($request)) {
+            $this->emit($request, 'Login Required.', 'system');
+            return;
+        }
+
+        $data = $request->getData();
+        $targetId = $data['id'];
+        if (!$request->isOnline($targetId)) {
+            $this->emit($request, '对方不在线.', 'system');
+            return;
+        }
+        if ($targetId === $request->getId()) {
+            $this->emit($request, '不能对自己发', 'system');
+            return;
+        }
+
+        $fd = $request->getFd($targetId);
+        $content = [
+            'event' => 'msg',
+            'type' => 'msg',
+            'target' => 'target',
+            'data' => $data['content']
+        ];
+        // 直接发
+        $request->send('msg', $targetId, $content);
+        // 后台发
+        $request->getServer()->task([
+            'self' => $request->getFd($request->getId()),
+            'fd' => $fd,
+            'content' => $content
+        ]);
+    }
+
     private function emit(Request $request, $data, string $type = 'msg'): void
     {
         $request->emit('msg', [

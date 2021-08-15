@@ -12,6 +12,7 @@ return [
     'type' => Server::WEBSOCKET,
     'settings' => [
         'worker_num' => 4,
+        'task_worker_num' => 1,
         'max_wait_time' => 10,
         'http_compression' => false
     ],
@@ -19,7 +20,9 @@ return [
         SwooleEvent::ON_OPEN => [WebSocketEvent::class, 'onOpen'],
         SwooleEvent::ON_WORKER_START => [WebSocketEvent::class, 'onWorkerStart'],
         SwooleEvent::ON_WORKER_STOP => [WebSocketEvent::class, 'onWorkerStop'],
-        SwooleEvent::ON_CLOSE => [WebSocketEvent::class, 'onClose']
+        SwooleEvent::ON_CLOSE => [WebSocketEvent::class, 'onClose'],
+        SwooleEvent::ON_TASK => [WebSocketEvent::class, 'onTask'],
+        SwooleEvent::ON_FINISH => [WebSocketEvent::class, 'onFinish']
     ],
     'servers' => [
         [

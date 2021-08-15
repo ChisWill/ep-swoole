@@ -51,4 +51,26 @@ class WebSocketEvent
     {
         echo $fd . ' close';
     }
+
+    public function onTask(Server $server, $taskId, $reactorId, $data)
+    {
+        $r = $server->push($data['fd'], $this->encode($data['content']));
+        if ($r) {
+            $server->finish($data['self']);
+        }
+    }
+
+    public function onFinish(Server $server, $taskId, $data)
+    {
+        $server->push($data, $this->encode([
+            'event' => 'msg',
+            'type' => 'system',
+            'data' => '推送成功'
+        ]));
+    }
+
+    private function encode($data): string
+    {
+        return json_encode([$data['event'], $data], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    }
 }

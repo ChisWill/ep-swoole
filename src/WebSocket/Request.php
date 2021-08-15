@@ -63,6 +63,11 @@ final class Request
         return $this->isGuest() ? null : $this->identity->getId();
     }
 
+    public function getFd(string $id): ?int
+    {
+        return $this->socketIdentityRepository->findFd($id);
+    }
+
     /**
      * @throws LogicException
      */
@@ -113,7 +118,7 @@ final class Request
      */
     public function send(string $event, string $id, $data): void
     {
-        if (($fd = $this->socketIdentityRepository->findFd($id)) !== null) {
+        if (($fd = $this->getFd($id)) !== null) {
             $this->server->push($fd, $this->encode([$event, $data]));
         }
     }
@@ -141,7 +146,7 @@ final class Request
 
     public function isOnline(string $id = null): bool
     {
-        $fd = $id === null ? $this->frame->fd : $this->socketIdentityRepository->findFd($id);
+        $fd = $id === null ? $this->frame->fd : $this->getFd($id);
 
         return $fd === null ? false : $this->server->isEstablished($fd);
     }
