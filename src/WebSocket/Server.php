@@ -73,7 +73,6 @@ final class Server implements ServerInterface
                 ->withControllerSuffix($this->config->webSocketSuffix)
                 ->run($handler, $request);
         } catch (Throwable $t) {
-            $this->errorRenderer->log($t, $request);
             $this->errorRenderer->render($t, $request);
         }
     }

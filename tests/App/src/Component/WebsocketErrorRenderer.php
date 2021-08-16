@@ -14,9 +14,11 @@ class WebsocketErrorRenderer implements WebsocketErrorRendererInterface
     public function render(Throwable $t, Request $request): void
     {
         $request->emit('error',  $t->getMessage() . ' in ' . $t->getFile() . ':' . $t->getLine());
+
+        $this->log($t, $request);
     }
 
-    public function log(Throwable $t, Request $request): void
+    private function log(Throwable $t, Request $request): void
     {
         Ep::getLogger()->emergency($t->getMessage(), [
             'detail' => $t->getTraceAsString()

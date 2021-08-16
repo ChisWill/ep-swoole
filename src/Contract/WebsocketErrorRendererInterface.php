@@ -10,6 +10,4 @@ use Throwable;
 interface WebsocketErrorRendererInterface
 {
     public function render(Throwable $t, Request $request): void;
-
-    public function log(Throwable $t, Request $request): void;
 }

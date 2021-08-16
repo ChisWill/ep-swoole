@@ -34,6 +34,8 @@ final class ErrorRenderer extends BaseErrorRenderer
                 ->render($t, $request);
         } else {
             $request->emit('error', parent::render($t, $request));
+
+            $this->log($t, $request);
         }
         return '';
     }
@@ -41,21 +43,15 @@ final class ErrorRenderer extends BaseErrorRenderer
     /**
      * @param Request $request
      */
-    public function log(Throwable $t, $request): void
+    private function log(Throwable $t, $request): void
     {
-        if ($this->container->has(WebsocketErrorRendererInterface::class)) {
-            $this->container
-                ->get(WebsocketErrorRendererInterface::class)
-                ->log($t, $request);
-        } else {
-            $context = [
-                'category' => get_class($t)
-            ];
+        $context = [
+            'category' => get_class($t)
+        ];
 
-            $context['route'] = $request->getRoute();
-            $context['data'] = $request->getData();
+        $context['route'] = $request->getRoute();
+        $context['data'] = $request->getData();
 
-            $this->logger->error(parent::render($t, $request), $context);
-        }
+        $this->logger->error(parent::render($t, $request), $context);
     }
 }

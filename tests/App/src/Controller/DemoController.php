@@ -12,7 +12,6 @@ use Ep\Web\ServerRequest;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
-use Swoole\Process;
 use Yiisoft\Aliases\Aliases;
 use Yiisoft\Cookies\Cookie;
 use Yiisoft\Cookies\CookieCollection;

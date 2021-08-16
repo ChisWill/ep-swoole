@@ -137,10 +137,8 @@ final class Request
             throw new LogicException('Not in room.');
         }
 
-        foreach ($this->nsp->connections($room) as $targetId) {
-            if ($targetId !== $id) {
-                $this->send($event, $targetId, $data);
-            }
+        foreach (array_diff($this->nsp->connections($room), [$id]) as $to) {
+            $this->send($event, $to, $data);
         }
     }
 
