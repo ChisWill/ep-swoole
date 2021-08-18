@@ -36,6 +36,9 @@ final class ServerFactory
         $this->settings = $settings + $this->config->settings;
     }
 
+    /**
+     * @throws InvalidArgumentException
+     */
     public function create(): ServerInterface
     {
         Coroutine::set(array_merge([
@@ -53,14 +56,18 @@ final class ServerFactory
     {
         switch ($this->config->type) {
             case self::TCP:
-                return $this->injector->make(TcpServer::class, [$this->config]);
+                $class = TcpServer::class;
+                break;
             case self::HTTP:
-                return $this->injector->make(HttpServer::class, [$this->config]);
+                $class = HttpServer::class;
+                break;
             case self::WEBSOCKET:
-                return $this->injector->make(WebSocketServer::class, [$this->config]);
+                $class = WebSocketServer::class;
+                break;
             default:
                 throw new InvalidArgumentException('The "type" configuration is invalid.');
         }
+        return $this->injector->make($class, [$this->config]);
     }
 
     private function getDefaultSettings(): array

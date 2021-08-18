@@ -44,6 +44,9 @@ abstract class Authentication implements AuthenticationMethodInterface
         return $new;
     }
 
+    /**
+     * @throws LogicException
+     */
     public function authenticate(ServerRequestInterface $request): ?IdentityInterface
     {
         if (!isset($this->fd)) {
