@@ -7,11 +7,11 @@ namespace Ep\Swoole\Http;
 use Ep\Swoole\Config;
 use Ep\Swoole\Contract\ServerInterface;
 use Ep\Swoole\Contract\ServerTrait;
-use Ep\Swoole\SwooleEvent;
 use Ep\Web\Application as WebApplication;
 use Ep\Web\ErrorRenderer;
 use Ep\Web\Service;
 use Yiisoft\Http\Method;
+use Swoole\Constant;
 use Swoole\Http\Request;
 use Swoole\Http\Response;
 use Swoole\Http\Server as HttpServer;
@@ -59,7 +59,7 @@ final class Server implements ServerInterface
      */
     protected function onRequest(): void
     {
-        $this->getServer()->on(SwooleEvent::ON_REQUEST, [$this, 'handleRequest']);
+        $this->getServer()->on(Constant::EVENT_REQUEST, [$this, 'handleRequest']);
     }
 
     public function handleRequest(Request $swooleRequest, Response $swooleResponse): void

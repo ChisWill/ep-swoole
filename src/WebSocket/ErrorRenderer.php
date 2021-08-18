@@ -33,9 +33,9 @@ final class ErrorRenderer extends BaseErrorRenderer
                 ->get(WebsocketErrorRendererInterface::class)
                 ->render($t, $request);
         } else {
-            $request->emit('error', parent::render($t, $request));
-
             $this->log($t, $request);
+
+            $request->emit('error', parent::render($t, $request));
         }
         return '';
     }

@@ -7,7 +7,7 @@ namespace Ep\Swoole\Tcp;
 use Ep\Swoole\Config;
 use Ep\Swoole\Contract\ServerInterface;
 use Ep\Swoole\Contract\ServerTrait;
-use Ep\Swoole\SwooleEvent;
+use Swoole\Constant;
 use Swoole\Server as SwooleServer;
 
 /**
@@ -37,7 +37,7 @@ final class Server implements ServerInterface
      */
     protected function onRequest(): void
     {
-        $this->getServer()->on(SwooleEvent::ON_RECEIVE, function (SwooleServer $server, int $fd, int $reactorId, string $data) {
+        $this->getServer()->on(Constant::EVENT_RECEIVE, function (SwooleServer $server, int $fd, int $reactorId, string $data) {
             echo "[#" . $server->worker_id . "][@{$reactorId}]\tClientFd:[$fd]\n" . $data;
         });
     }

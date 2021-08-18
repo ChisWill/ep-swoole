@@ -14,7 +14,8 @@
         "swoole/ide-helper": "^4.6",
         "yiisoft/db-mysql": "3.0.x-dev",
         "yiisoft/db-redis": "1.0.x-dev",
-        "yiisoft/db-sqlite": "dev-master"
+        "yiisoft/db-sqlite": "dev-master",
+        "yiisoft/log-target-file": "dev-master"
     },
     "suggest": {
         "yiisoft/db-redis": "Allows websocket server working with multiple process"

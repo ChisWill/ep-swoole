@@ -7,7 +7,6 @@ namespace Ep\Swoole\Contract;
 use Ep;
 use Ep\Base\ErrorRenderer;
 use Ep\Swoole\Config;
-use Ep\Swoole\SwooleEvent;
 use Swoole\Server;
 use Swoole\Server\Port;
 use InvalidArgumentException;
@@ -57,9 +56,6 @@ trait ServerTrait
     {
         $di = Ep::getDi();
         foreach ($events as $event => $callback) {
-            if (!SwooleEvent::isSwooleEvent($event)) {
-                throw new InvalidArgumentException("The \"servers[events]\" configuration must have Swoole Event as the key of the array.");
-            }
             if (!is_callable($callback) && !is_array($callback)) {
                 throw new InvalidArgumentException("The \"servers[events]\" configuration is an array of string-callback pairs.");
             }

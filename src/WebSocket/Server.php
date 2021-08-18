@@ -9,7 +9,7 @@ use Ep\Swoole\Config;
 use Ep\Swoole\Contract\ServerInterface;
 use Ep\Swoole\Contract\ServerTrait;
 use Ep\Swoole\Http\Server as HttpServer;
-use Ep\Swoole\SwooleEvent;
+use Swoole\Constant;
 use Swoole\WebSocket\Frame;
 use Swoole\WebSocket\Server as WebSocketServer;
 use Throwable;
@@ -57,9 +57,9 @@ final class Server implements ServerInterface
      */
     protected function onRequest(): void
     {
-        $this->getServer()->on(SwooleEvent::ON_MESSAGE, [$this, 'handleMessage']);
+        $this->getServer()->on(Constant::EVENT_MESSAGE, [$this, 'handleMessage']);
 
-        $this->getServer()->on(SwooleEvent::ON_REQUEST, [$this->httpServer, 'handleRequest']);
+        $this->getServer()->on(Constant::EVENT_REQUEST, [$this->httpServer, 'handleRequest']);
     }
 
     public function handleMessage(WebSocketServer $server, Frame $frame): void
