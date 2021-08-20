@@ -239,8 +239,9 @@ class DemoController extends Controller
         $this->title = 'Simple Chat Room';
 
         $id = $request->getQueryParams()['id'] ?? '';
+        $host = $request->getUri()->getHost();
 
-        return $this->string($view->render('chat', compact('id')));
+        return $this->string($view->render('chat', compact('id', 'host')));
     }
 
     public function chatRoomAction(ServerRequest $request)
@@ -249,8 +250,9 @@ class DemoController extends Controller
         $this->title = 'Chat Room';
 
         $id = $request->getQueryParams()['id'] ?? '';
+        $host = $request->getUri()->getHost();
 
-        return $this->string($view->render('chatRoom', compact('id')));
+        return $this->string($view->render('chatRoom', compact('id', 'host')));
     }
 
     public function socketioAction()

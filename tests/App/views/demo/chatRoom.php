@@ -85,7 +85,7 @@ use Ep\Helper\Str; ?>
 
 <script>
     let events = {};
-    let websocket = new WebSocket('ws://127.0.0.1:9501/ab?access-token=<?= base64_encode(json_encode('A' . ($_GET['u'] ?? 1))) ?>');
+    let websocket = new WebSocket('ws://<?= $host ?>:9501/ab?access-token=<?= base64_encode(json_encode('A' . ($_GET['u'] ?? 1))) ?>');
     let display = function(data, type = 'center') {
         let date = new Date;
         let msg = data + ' ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds();

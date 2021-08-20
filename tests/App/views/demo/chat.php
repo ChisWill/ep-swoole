@@ -68,7 +68,7 @@
 </div>
 
 <script>
-    let websocket = new WebSocket('ws://127.0.0.1:9501');
+    let websocket = new WebSocket('ws://<?= $host ?>:9501');
     class EpWebSocket {
         constructor(webSocket) {
             this.webSocket = webSocket;
