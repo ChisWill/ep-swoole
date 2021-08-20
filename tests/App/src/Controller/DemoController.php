@@ -19,11 +19,14 @@ use Swoole\ConnectionPool;
 use Yiisoft\Aliases\Aliases;
 use Yiisoft\Cookies\Cookie;
 use Yiisoft\Cookies\CookieCollection;
+use Yiisoft\Db\Cache\QueryCache;
+use Yiisoft\Db\Cache\SchemaCache;
 use Yiisoft\Db\Connection\ConnectionInterface;
 use Yiisoft\Db\Connection\LazyConnectionDependencies;
 use Yiisoft\Db\Mysql\Connection as MysqlConnection;
 use Yiisoft\Db\Redis\Connection;
 use Yiisoft\Http\Method;
+use Yiisoft\Profiler\ProfilerInterface;
 use Yiisoft\Session\SessionInterface;
 
 class DemoController extends Controller
@@ -139,6 +142,41 @@ class DemoController extends Controller
         $newName = '0!§ $&()=`´{}  []²³@€µ^°_+\' # - _ . , ; ü ä ö ß 9.jpg';
 
         return $this->getService()->download($file, $newName);
+    }
+
+    public function dbAction(ServerRequest $request)
+    {
+        $key = ($request->getQueryParams()['key'] ?? 'a');
+        $map = [
+            'a' => 1,
+            'b' => 3,
+        ];
+        Ep::getDi()->get(ProfilerInterface::class);
+        Ep::getDi()->get(QueryCache::class);
+        Ep::getDi()->get(SchemaCache::class);
+
+        /** @var MysqlConnection */
+        $db = Ep::getDb();
+
+        // do {
+        //     usleep(10 * 1000);
+        // } while (date('i') != 15 || date('s') != 55);
+
+        $count = 0;
+        for ($i = 100; $i--;) {
+            echo $key;
+            $result = Query::find($db)->from('user')->where(['like', 'username', $key])->all();
+            if (count($result) != $map[$key]) {
+                // echo $key . 'error' . "\n";
+                $count++;
+            }
+            usleep(mt_rand(10, 20));
+        }
+        echo $key . ':' . $count . "\n";
+
+        unset($db);
+
+        return $this->json($result);
     }
 
     public function poolAction(ServerRequest $request)
