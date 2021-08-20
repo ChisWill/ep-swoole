@@ -38,18 +38,6 @@ class DemoController extends Controller
 
     public function __construct()
     {
-        $dsn = 'mysql:host=127.0.0.1;dbname=test';
-        $this->pdo = new PDO($dsn, 'root', '');
-        $this->pdo->exec('set names utf8');
-
-        if (class_exists(ConnectionPool::class)) {
-            $this->pool = new ConnectionPool(function () {
-                $db = new MysqlConnection('mysql:host=127.0.0.1;dbname=test', Ep::getDi()->get(LazyConnectionDependencies::class));
-                $db->setUsername('root');
-                $db->setPassword('');
-                return $db;
-            });
-        }
     }
 
     public function indexAction()
@@ -176,64 +164,6 @@ class DemoController extends Controller
 
         unset($db);
 
-        return $this->json($result);
-    }
-
-    public function poolAction(ServerRequest $request)
-    {
-        $key = ($request->getQueryParams()['key'] ?? 'a');
-        $map = [
-            'a' => 1,
-            'b' => 3,
-        ];
-        do {
-            usleep(10 * 1000);
-        } while (date('i') != 23 || date('s') != 45);
-
-        /** @var ConnectionInterface */
-        $db = $this->pool->get();
-
-        $count = 0;
-        for ($i = 100; $i--;) {
-            echo $key;
-            $result = Query::find($db)->from('user')->where(['like', 'username', $key])->all();
-            if (count($result) != $map[$key]) {
-                // echo $key . 'error' . "\n";
-                $count++;
-            }
-        }
-        echo $key . ':' . $count . "\n";
-
-        $this->pool->put($db);
-
-        return $this->json($result);
-    }
-
-    public function pdoAction(ServerRequest $request)
-    {
-        $key = ($request->getQueryParams()['key'] ?? 'a');
-        $map = [
-            'a' => 1,
-            'b' => 3,
-        ];
-        do {
-            usleep(10 * 1000);
-        } while (date('i') != 19 || date('s') != 25);
-
-        $count = 0;
-        for ($i = 100; $i--;) {
-            echo $key;
-            $st = $this->pdo->prepare('select * from user where username like :id');
-            $st->execute([
-                ':id' => '%' . $key . '%'
-            ]);
-            $result = $st->fetchAll(PDO::FETCH_ASSOC);
-            if (count($result) != $map[$key]) {
-                // echo $key . 'error' . "\n";
-                $count++;
-            }
-        }
-        echo $key . ':' . $count . "\n";
         return $this->json($result);
     }
 
