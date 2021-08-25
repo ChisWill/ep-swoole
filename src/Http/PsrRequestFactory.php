@@ -37,27 +37,29 @@ final class PsrRequestFactory
 
     public function createFromSwooleRequest(Request $request): ServerRequestInterface
     {
-        $method = $request->server['request_method'] ?? Method::GET;
-        $uri = $this->getUri($request);
-        $serverRequest = new ServerRequest($this->serverRequestFactory->createServerRequest($method, $uri, $request->server));
+        $serverRequest = new ServerRequest($this->serverRequestFactory->createServerRequest(
+            $request->server['request_method'] ?? Method::GET,
+            $this->getUri($request),
+            $request->server
+        ));
 
         foreach ($request->header as $name => $value) {
-            if ($name === 'host' && $serverRequest->hasHeader('host')) {
+            if ($serverRequest->hasHeader($name)) {
                 continue;
             }
             $serverRequest = $serverRequest->withAddedHeader($name, $value);
         }
 
         return $serverRequest
-            ->withProtocolVersion($this->getProtocolVersion($request->server, '1.1'))
+            ->withProtocolVersion($this->getProtocolVersion($request->server))
+            ->withCookieParams($request->cookie ?: [])
             ->withQueryParams($request->get ?: [])
             ->withParsedBody($request->post ?: [])
-            ->withCookieParams($request->cookie ?: [])
             ->withUploadedFiles($this->getUploadedFiles($request->files ?: []))
             ->withBody($this->getStream($request));
     }
 
-    private function getProtocolVersion(array $server, string $default): string
+    private function getProtocolVersion(array $server, string $default = '1.1'): string
     {
         if (array_key_exists('server_protocol', $server) && $server['server_protocol'] !== '') {
             return str_replace('HTTP/', '', $server['server_protocol']);

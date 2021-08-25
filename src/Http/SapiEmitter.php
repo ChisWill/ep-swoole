@@ -46,9 +46,7 @@ final class SapiEmitter
     private function emitBody(ResponseInterface $response): void
     {
         $body = $response->getBody();
-        if ($body->isSeekable()) {
-            $body->rewind();
-        }
+        $body->rewind();
         while (!$body->eof()) {
             $this->response->write($body->read(2_097_152));
         }
