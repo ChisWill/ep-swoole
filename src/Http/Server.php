@@ -57,9 +57,9 @@ final class Server implements ServerInterface
     /**
      * {@inheritDoc}
      */
-    protected function onRequest(): void
+    protected function bootstrap(HttpServer $server): void
     {
-        $this->getServer()->on(Constant::EVENT_REQUEST, [$this, 'handleRequest']);
+        $server->on(Constant::EVENT_REQUEST, [$this, 'handleRequest']);
     }
 
     public function handleRequest(Request $swooleRequest, Response $swooleResponse): void

@@ -305,8 +305,21 @@ class DemoController extends Controller
         return $this->string($r);
     }
 
-    public function testAction()
+    public function loginAction(ServerRequest $request, SessionInterface $session)
     {
-        return $this->string('over');
+        $id = $session->get('id');
+
+        if (!$id) {
+            $id = $request->getQueryParams()['id'] ?? '1';
+            $session->set('id', $id);
+        }
+
+        $name = Student::find(Ep::getDb('sqlite'))
+            ->select('name')
+            ->where([
+                'id' => $id
+            ])->scalar();
+
+        return $this->string($name);
     }
 }

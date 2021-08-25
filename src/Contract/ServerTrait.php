@@ -36,6 +36,7 @@ trait ServerTrait
             );
 
             $this->bindEvent($this->server, $this->config->events);
+
             $this->createSubServer($this->server, $this->config->servers);
         }
 
@@ -44,9 +45,11 @@ trait ServerTrait
 
     public function start(): void
     {
-        $this->onRequest();
+        $server = $this->getServer();
 
-        $this->getServer()->start();
+        $this->bootstrap($server);
+
+        $server->start();
     }
 
     /**
@@ -101,5 +104,5 @@ trait ServerTrait
 
     abstract protected function getServerClass(): string;
 
-    abstract protected function onRequest(): void;
+    abstract protected function bootstrap(Server $server): void;
 }

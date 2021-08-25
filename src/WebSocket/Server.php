@@ -55,11 +55,11 @@ final class Server implements ServerInterface
     /**
      * {@inheritDoc}
      */
-    protected function onRequest(): void
+    protected function bootstrap(WebSocketServer $server): void
     {
-        $this->getServer()->on(Constant::EVENT_MESSAGE, [$this, 'handleMessage']);
+        $server->on(Constant::EVENT_MESSAGE, [$this, 'handleMessage']);
 
-        $this->getServer()->on(Constant::EVENT_REQUEST, [$this->httpServer, 'handleRequest']);
+        $server->on(Constant::EVENT_REQUEST, [$this->httpServer, 'handleRequest']);
     }
 
     public function handleMessage(WebSocketServer $server, Frame $frame): void

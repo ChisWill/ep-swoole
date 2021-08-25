@@ -35,9 +35,9 @@ final class Server implements ServerInterface
     /**
      * {@inheritDoc}
      */
-    protected function onRequest(): void
+    protected function bootstrap(SwooleServer $server): void
     {
-        $this->getServer()->on(Constant::EVENT_RECEIVE, function (SwooleServer $server, int $fd, int $reactorId, string $data) {
+        $server->on(Constant::EVENT_RECEIVE, function (SwooleServer $server, int $fd, int $reactorId, string $data) {
             echo "[#" . $server->worker_id . "][@{$reactorId}]\tClientFd:[$fd]\n" . $data;
         });
     }

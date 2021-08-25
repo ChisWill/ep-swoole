@@ -62,7 +62,7 @@ class ChatSocket extends Controller
             'data' => $data['content']
         ];
         // 直接发
-        $request->send('msg', $targetId, $content);
+        // $request->send('msg', $targetId, $content);
         // 后台发
         $request->getServer()->task([
             'self' => $request->getFd($request->getId()),

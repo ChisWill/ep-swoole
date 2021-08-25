@@ -118,7 +118,8 @@ final class Request
      */
     public function send(string $event, string $id, $data): void
     {
-        if (($fd = $this->getFd($id)) !== null) {
+        $fd = null;
+        if ($this->isOnline($id, $fd)) {
             $this->server->push($fd, $this->encode([$event, $data]));
         }
     }
@@ -142,7 +143,7 @@ final class Request
         }
     }
 
-    public function isOnline(string $id = null): bool
+    public function isOnline(string $id = null, int &$fd = null): bool
     {
         $fd = $id === null ? $this->frame->fd : $this->getFd($id);
 

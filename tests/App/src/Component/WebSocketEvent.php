@@ -32,7 +32,7 @@ class WebSocketEvent
             if (!$identity) {
                 $server->close($request->fd);
             } else {
-                echo $identity->getId();
+                // echo $identity->getId();
             }
         }
     }
@@ -49,7 +49,7 @@ class WebSocketEvent
 
     public function onClose(Server $server, int $fd)
     {
-        echo $fd . ' close';
+        // echo $fd . ' close';
     }
 
     public function onTask(Server $server, $taskId, $reactorId, $data)

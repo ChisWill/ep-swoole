@@ -28,19 +28,22 @@ final class SapiEmitter
 
     public function emit(ResponseInterface $response, bool $withoutBody = false): void
     {
-        $withoutBody = $withoutBody || !$this->shouldOutputBody($response);
-
         $this->response->setStatusCode($response->getStatusCode());
 
-        foreach ($response->getHeaders() as $header => $values) {
-            $this->response->setHeader($header, $values, false);
-        }
+        $this->emitHeaders($response);
 
-        if (!$withoutBody) {
+        if (!$withoutBody && $this->shouldOutputBody($response)) {
             $this->emitBody($response);
         }
 
         $this->response->end();
+    }
+
+    private function emitHeaders(ResponseInterface $response): void
+    {
+        foreach ($response->getHeaders() as $header => $values) {
+            $this->response->setHeader($header, $values, false);
+        }
     }
 
     private function emitBody(ResponseInterface $response): void
@@ -54,20 +57,6 @@ final class SapiEmitter
 
     private function shouldOutputBody(ResponseInterface $response): bool
     {
-        if (in_array($response->getStatusCode(), self::NO_BODY_RESPONSE_CODES, true)) {
-            return false;
-        }
-
-        $body = $response->getBody();
-        if (!$body->isReadable()) {
-            return false;
-        }
-
-        $size = $body->getSize();
-        if ($size !== null) {
-            return $size > 0;
-        }
-
-        return true;
+        return !in_array($response->getStatusCode(), self::NO_BODY_RESPONSE_CODES, true);
     }
 }

@@ -95,6 +95,21 @@ use Ep\Helper\Str; ?>
         $("#message-area .end")[0].scrollIntoView();
     }
 
+    let getRandomChineseWord = function(count = 1) {
+        let get = function() {
+            let text = "";
+            let random = Math.floor(Math.random() * (40870 - 19968) + 19968).toString(16);
+            eval("text=" + '"\\u' + random + '"');
+            return text;
+        }
+        let text = '';
+        for (let i = 0; i < count; i++) {
+            text += get();
+        }
+        return text;
+    }
+    $("#input-box").val(getRandomChineseWord(7));
+
     websocket.emit = function(event, data = '') {
         this.send(JSON.stringify([
             event,
@@ -190,5 +205,6 @@ use Ep\Helper\Str; ?>
             text: text,
             room: $("#hall-id").val()
         });
+        $("#input-box").val(getRandomChineseWord(7));
     });
 </script>
