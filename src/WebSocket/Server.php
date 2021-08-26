@@ -10,6 +10,7 @@ use Ep\Swoole\Contract\ServerInterface;
 use Ep\Swoole\Contract\ServerTrait;
 use Ep\Swoole\Http\Server as HttpServer;
 use Swoole\Constant;
+use Swoole\Server as SwooleServer;
 use Swoole\WebSocket\Frame;
 use Swoole\WebSocket\Server as WebSocketServer;
 use Throwable;
@@ -55,7 +56,7 @@ final class Server implements ServerInterface
     /**
      * {@inheritDoc}
      */
-    protected function bootstrap(WebSocketServer $server): void
+    protected function bootstrap(SwooleServer $server): void
     {
         $server->on(Constant::EVENT_MESSAGE, [$this, 'handleMessage']);
 

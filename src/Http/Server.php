@@ -15,6 +15,7 @@ use Swoole\Constant;
 use Swoole\Http\Request;
 use Swoole\Http\Response;
 use Swoole\Http\Server as HttpServer;
+use Swoole\Server as SwooleServer;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Throwable;
@@ -57,7 +58,7 @@ final class Server implements ServerInterface
     /**
      * {@inheritDoc}
      */
-    protected function bootstrap(HttpServer $server): void
+    protected function bootstrap(SwooleServer $server): void
     {
         $server->on(Constant::EVENT_REQUEST, [$this, 'handleRequest']);
     }
