@@ -13,5 +13,5 @@ return [
     'di' => require('di.php'),
     'route' => require('route.php'),
     'events' => require('events.php'),
-    'params' => require('params.php')
+    'params' => array_merge(require('params.php'), require('params-local.php'))
 ];
