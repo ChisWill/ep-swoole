@@ -307,19 +307,40 @@ class DemoController extends Controller
 
     public function loginAction(ServerRequest $request, SessionInterface $session)
     {
-        $id = $session->get('id');
-
+        $id = $request->getParsedBody()['id'] ?? $request->getQueryParams()['id'] ?? 0;
         if (!$id) {
-            $id = $request->getQueryParams()['id'] ?? '1';
-            $session->set('id', $id);
+            return $this->error('');
         }
 
-        $name = Student::find(Ep::getDb('sqlite'))
-            ->select('name')
+        $session->set('id', $id);
+
+        $ok = Student::find(Ep::getDb('sqlite'))
             ->where([
                 'id' => $id
-            ])->scalar();
+            ])
+            ->exists();
 
-        return $this->string($name);
+        if ($ok) {
+            return $this->success();
+        } else {
+            return $this->error('');
+        }
+    }
+
+    public function getUserAction(ServerRequest $request, SessionInterface $session)
+    {
+        $id = $session->get('id');
+
+        $user = Student::find(Ep::getDb('sqlite'))
+            ->where([
+                'id' => $id
+            ])
+            ->one();
+
+        if ($user) {
+            return $this->success($user['id']);
+        } else {
+            return $this->error('');
+        }
     }
 }
