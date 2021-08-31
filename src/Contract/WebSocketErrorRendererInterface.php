@@ -7,7 +7,7 @@ namespace Ep\Swoole\Contract;
 use Ep\Swoole\WebSocket\Request;
 use Throwable;
 
-interface WebSocketRendererInterface
+interface WebSocketErrorRendererInterface
 {
     public function render(Throwable $t, Request $request): void;
 }

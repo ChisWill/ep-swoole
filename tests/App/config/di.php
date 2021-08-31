@@ -5,7 +5,7 @@ declare(strict_types=1);
 use Ep\Base\Config;
 use Ep\Swoole\Contract\NspAdapterInterface;
 use Ep\Swoole\Contract\WebSocketIdentityRepositoryInterface;
-use Ep\Swoole\Contract\WebSocketRendererInterface;
+use Ep\Swoole\Contract\WebSocketErrorRendererInterface;
 use Ep\Swoole\WebSocket\NspAdapter\ArrayAdapter;
 use Ep\Swoole\WebSocket\NspAdapter\RedisAdapter;
 use Ep\Tests\App\Component\IdentityRepository;
@@ -33,7 +33,7 @@ return static fn (Config $config): array => [
     },
     WebSocketIdentityRepositoryInterface::class => IdentityRepository::class,
     NspAdapterInterface::class => RedisAdapter::class,
-    WebSocketRendererInterface::class => WebsocketErrorRenderer::class,
+    WebSocketErrorRendererInterface::class => WebsocketErrorRenderer::class,
     // Sqlite
     'sqlite' => [
         'class' => SqliteConnection::class,

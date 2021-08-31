@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Ep\Tests\App\Component;
 
 use Ep;
-use Ep\Swoole\Contract\WebSocketRendererInterface;
+use Ep\Swoole\Contract\WebSocketErrorRendererInterface;
 use Ep\Swoole\WebSocket\Request;
 use Throwable;
 
-class WebSocketRenderer implements WebSocketRendererInterface
+class WebSocketRenderer implements WebSocketErrorRendererInterface
 {
     public function render(Throwable $t, Request $request): void
     {

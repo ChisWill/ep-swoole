@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Ep\Swoole\WebSocket;
 
 use Ep\Base\ErrorRenderer as BaseErrorRenderer;
-use Ep\Swoole\Contract\WebsocketErrorRendererInterface;
+use Ep\Swoole\Contract\WebSocketErrorRendererInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Throwable;
@@ -28,9 +28,9 @@ final class ErrorRenderer extends BaseErrorRenderer
      */
     public function render(Throwable $t, $request): string
     {
-        if ($this->container->has(WebsocketErrorRendererInterface::class)) {
+        if ($this->container->has(WebSocketErrorRendererInterface::class)) {
             $this->container
-                ->get(WebsocketErrorRendererInterface::class)
+                ->get(WebSocketErrorRendererInterface::class)
                 ->render($t, $request);
         } else {
             $this->log($t, $request);
