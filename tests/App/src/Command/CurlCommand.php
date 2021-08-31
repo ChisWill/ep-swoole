@@ -47,9 +47,9 @@ class CurlCommand extends Command
         $r = $this->service->getUserId($cookie);
 
         if ($r === $id) {
-            return $this->success('OK');
+            return $this->success('S' . $id);
         } else {
-            return $this->error('ERR');
+            return $this->error('E' . $id . '-' . $r);
         }
     }
 
@@ -57,16 +57,11 @@ class CurlCommand extends Command
     {
         $manager = new Manager();
 
-        for ($i = 1; $i <= 2; $i++) {
+        for ($i = 1; $i <= 4; $i++) {
             $manager->add(function () use ($i) {
-                $r = $this->getService()->call('curl/do', [
+                $this->getService()->call('curl/do', [
                     'id' => $i
                 ]);
-                if ($r === 0) {
-                    echo 0;
-                } else {
-                    echo 1;
-                }
             }, false);
         }
 

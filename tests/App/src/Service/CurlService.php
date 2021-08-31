@@ -42,7 +42,7 @@ final class CurlService
             'header' => [
                 'Cookie: ' . $cookie
             ]
-        ]);
+        ]) ?: '';
         $result = json_decode($r, true);
         return (int) ($result['body'] ?? 0);
     }
