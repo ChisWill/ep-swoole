@@ -10,12 +10,15 @@ use Ep\Annotation\Inject;
 use Ep\Swoole\WebSocket\Nsp;
 use Ep\Tests\App\Aspect\EchoIntAspect;
 use Ep\Tests\App\Component\Controller;
+use Ep\Tests\App\Kit\Math;
 use Ep\Tests\App\Middleware\TimeMiddleware;
 use Ep\Tests\App\Service\TestService;
-use Ep\Web\ErrorHandler;
+use Ep\Tests\Support\Normal\Eagle;
+use Ep\Web\ErrorRenderer;
 use Psr\Http\Message\ServerRequestInterface;
 use RuntimeException;
 use Yiisoft\Db\Redis\Connection;
+use Yiisoft\Factory\Factory;
 
 class TestController extends Controller
 {
@@ -89,16 +92,40 @@ class TestController extends Controller
         return $this->string($this->service->getRandomString());
     }
 
-    public function tAction()
+    public function tAction(ServerRequestInterface $request)
     {
-        return $this->string();
+        $start = memory_get_usage();
+        $count = mt_rand(100, 200);
+        for ($i = $count; $i--;) {
+            $this->service->handleRequest($request);
+        }
+        $middle = memory_get_usage();
+        for ($i = $count; $i--;) {
+            $this->service->handleRequest($request);
+        }
+        $end = memory_get_usage();
+        tt(Math::formatByte($middle - $start), Math::formatByte($end - $middle));
     }
+
+    public function factoryAction()
+    {
+        $difinition = [
+            'class' => Eagle::class,
+            '__construct()' => ['Slap']
+        ];
+
+        $factory = new Factory(Ep::getDi());
+        $eagle = $factory->create($difinition);
+
+        tt($eagle);
+    }
+
 
     public function errorAction(ServerRequestInterface $request)
     {
-        $handler = Ep::getDi()->get(ErrorHandler::class);
+        $handler = Ep::getDi()->get(ErrorRenderer::class);
 
-        return $this->string($handler->renderException(
+        return $this->string($handler->render(
             new RuntimeException(
                 '我错了',
                 500,

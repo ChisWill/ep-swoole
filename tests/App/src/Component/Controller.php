@@ -24,7 +24,7 @@ class Controller extends \Ep\Web\Controller
      * @param array|string $error
      * @param array|string $body
      */
-    protected function error($error, int $errno = 500, $body = []): ResponseInterface
+    protected function error($error = '', int $errno = 500, $body = []): ResponseInterface
     {
         return $this->json([
             'errno' => $errno,

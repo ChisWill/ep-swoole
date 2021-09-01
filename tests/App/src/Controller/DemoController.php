@@ -323,24 +323,27 @@ class DemoController extends Controller
         if ($ok) {
             return $this->success();
         } else {
-            return $this->error('');
+            return $this->error();
         }
     }
 
     public function getUserAction(ServerRequest $request, SessionInterface $session)
     {
-        $id = $session->get('id');
+        $id = $session->get('id') ?: $request->getQueryParams()['id'] ?? 0;
+        // $db = $request->getAttribute('sqlite');
+        /** @var MysqlConnection */
+        $db = $request->getAttribute('mysql');
 
-        $user = Student::find(Ep::getDb('sqlite'))
+        $user = Student::find($db)
             ->where([
                 'id' => $id
             ])
             ->one();
 
-        if ($user) {
+        if (!empty($user)) {
             return $this->success($user['id']);
         } else {
-            return $this->error('');
+            return $this->error();
         }
     }
 }
