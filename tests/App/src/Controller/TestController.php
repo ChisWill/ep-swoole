@@ -10,7 +10,7 @@ use Ep\Annotation\Inject;
 use Ep\Swoole\WebSocket\Nsp;
 use Ep\Tests\App\Aspect\EchoIntAspect;
 use Ep\Tests\App\Component\Controller;
-use Ep\Tests\App\Kit\Math;
+use Ep\Tests\App\Kit\MathKit;
 use Ep\Tests\App\Middleware\TimeMiddleware;
 use Ep\Tests\App\Service\TestService;
 use Ep\Tests\Support\Normal\Eagle;
@@ -104,7 +104,7 @@ class TestController extends Controller
             $this->service->handleRequest($request);
         }
         $end = memory_get_usage();
-        tt(Math::formatByte($middle - $start), Math::formatByte($end - $middle));
+        tt(MathKit::formatByte($middle - $start), MathKit::formatByte($end - $middle));
     }
 
     public function factoryAction()
