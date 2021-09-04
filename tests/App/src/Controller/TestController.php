@@ -53,22 +53,22 @@ class TestController extends Controller
     {
         sleep(5);
 
-        return 'ok';
+        return $this->string('ok');
     }
 
     public function stringAction()
     {
-        return 'test string';
+        return $this->string('test string');
     }
 
     public function arrayAction()
     {
-        return [
+        return $this->json([
             'state' => 1,
             'data' => [
                 'msg' => 'ok'
             ]
-        ];
+        ]);
     }
 
     public function nspAction(Nsp $nsp, Connection $redis)
