@@ -14,7 +14,9 @@ return [
         'worker_num' => 1,
         'task_worker_num' => 1,
         'max_wait_time' => 10,
-        'http_compression' => false
+        'http_compression' => false,
+        'document_root' => dirname(__DIR__) . '/public',
+        'enable_static_handler' => true,
     ],
     'events' => [
         Constant::EVENT_OPEN => [WebSocketEvent::class, 'onOpen'],

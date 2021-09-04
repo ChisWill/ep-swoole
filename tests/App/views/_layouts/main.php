@@ -1,22 +1,35 @@
 <?php
 
 /**
- * @var Ep\Base\View $this 
+ * @var Ep\Web\View $this 
  */
+
+use Ep\Tests\App\Asset\JqueryAsset;
+
+$this->register([
+    JqueryAsset::class
+]);
+
+$this->beginPage();
 ?>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="data:image/ico;base64,aWNv">
-    <title><?= $this->context->title ?: 'Basic - EP' ?></title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Demo - EP</title>
+    <?php $this->head() ?>
 </head>
 
 <body>
+    <?php $this->beginBody(); ?>
+
     <header>
         <h3>头部</h3>
+        <h2>Controller: <?= $this->context->id ?></h2>
+        <h3>Action: <?= $this->context->actionId ?></h3>
     </header>
 
     <?= $content ?>
@@ -24,6 +37,10 @@
     <footer>
         <h3>尾部</h3>
     </footer>
+
+    <?php $this->endBody(); ?>
 </body>
 
 </html>
+<?php
+$this->endPage();

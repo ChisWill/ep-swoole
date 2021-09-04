@@ -15,6 +15,7 @@ use Ep\Tests\App\Middleware\TimeMiddleware;
 use Ep\Tests\App\Service\TestService;
 use Ep\Tests\Support\Normal\Eagle;
 use Ep\Web\ErrorRenderer;
+use PDO;
 use Psr\Http\Message\ServerRequestInterface;
 use RuntimeException;
 use Yiisoft\Db\Redis\Connection;
@@ -41,6 +42,11 @@ class TestController extends Controller
         $message = 'test';
 
         return $this->render('/index/index', compact('message'));
+    }
+
+    public function viewAction()
+    {
+        return $this->render('view');
     }
 
     public function sleepAction()
@@ -120,6 +126,15 @@ class TestController extends Controller
         tt($eagle);
     }
 
+    public function pdoAction()
+    {
+        $pdo = new PDO('mysql:host=127.0.0.1;dbname=test', 'root', '');
+        $sql = 'select * from student where 1';
+        $st = $pdo->query($sql);
+        $data = $st->fetchAll(PDO::FETCH_ASSOC);
+
+        return $this->json($data);
+    }
 
     public function errorAction(ServerRequestInterface $request)
     {
