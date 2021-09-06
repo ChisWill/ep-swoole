@@ -33,7 +33,7 @@ class TestController extends Controller
     public function __construct()
     {
         $this->setMiddlewares([
-            TimeMiddleware::class
+            // TimeMiddleware::class
         ]);
     }
 
@@ -103,11 +103,11 @@ class TestController extends Controller
         $start = memory_get_usage();
         $count = mt_rand(100, 200);
         for ($i = $count; $i--;) {
-            $this->service->handleRequest($request);
+            $this->service->handleRequest();
         }
         $middle = memory_get_usage();
         for ($i = $count; $i--;) {
-            $this->service->handleRequest($request);
+            $this->service->handleRequest();
         }
         $end = memory_get_usage();
         tt(MathKit::formatByte($middle - $start), MathKit::formatByte($end - $middle));
@@ -124,16 +124,6 @@ class TestController extends Controller
         $eagle = $factory->create($difinition);
 
         tt($eagle);
-    }
-
-    public function pdoAction()
-    {
-        $pdo = new PDO('mysql:host=127.0.0.1;dbname=test', 'root', '');
-        $sql = 'select * from student where 1';
-        $st = $pdo->query($sql);
-        $data = $st->fetchAll(PDO::FETCH_ASSOC);
-
-        return $this->json($data);
     }
 
     public function errorAction(ServerRequestInterface $request)

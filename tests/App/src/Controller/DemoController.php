@@ -346,4 +346,14 @@ class DemoController extends Controller
             return $this->error();
         }
     }
+
+    public function pdoAction()
+    {
+        $pdo = new PDO('mysql:host=127.0.0.1;dbname=test', 'root', '');
+        $sql = 'select * from student where 1';
+        $st = $pdo->query($sql);
+        $data = $st->fetchAll(PDO::FETCH_ASSOC);
+
+        return $this->success($data);
+    }
 }
