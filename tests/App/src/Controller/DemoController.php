@@ -329,7 +329,7 @@ class DemoController extends Controller
 
     public function getUserAction(ServerRequest $request, SessionInterface $session)
     {
-        $id = $session->get('id') ?: $request->getQueryParams()['id'] ?? 0;
+        $id = $session->get('id') ?: $request->getQueryParams()['id'] ?? 1;
         // $db = $request->getAttribute('sqlite');
         /** @var MysqlConnection */
         $db = $request->getAttribute('mysql');

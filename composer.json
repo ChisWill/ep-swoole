@@ -35,7 +35,7 @@
         }
     },
     "scripts": {
-        "post-update-cmd": "php ./vendor/bin/ep scan/annotation"
+        "post-update-cmd": "php ./vendor/bin/ep scan"
     },
     "config": {
         "sort-packages": true

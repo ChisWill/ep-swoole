@@ -100,17 +100,18 @@ class TestController extends Controller
 
     public function tAction(ServerRequestInterface $request)
     {
+        $action = $request->getQueryParams()['a'] ?? 'pdo';
         $start = memory_get_usage();
         $count = mt_rand(100, 200);
         for ($i = $count; $i--;) {
-            $this->service->handleRequest();
+            $this->service->handleRequest($action);
         }
         $middle = memory_get_usage();
         for ($i = $count; $i--;) {
-            $this->service->handleRequest();
+            $this->service->handleRequest($action);
         }
         $end = memory_get_usage();
-        tt(MathKit::formatByte($middle - $start), MathKit::formatByte($end - $middle));
+        return $this->string(MathKit::formatByte($middle - $start) . '<br>' . MathKit::formatByte($end - $middle));
     }
 
     public function factoryAction()

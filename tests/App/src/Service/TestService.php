@@ -65,12 +65,13 @@ class TestService
         tt($result);
     }
 
-    public function handleRequest(): void
+    public function handleRequest(string $action): void
     {
+        $_SERVER = ['REQUEST_METHOD' => 'GET'];
         $request = new ServerRequest($this->serverRequestFactory->createFromGlobals());
         $uri = $request
             ->getUri()
-            ->withPath('/demo/pdo');
+            ->withPath('/demo/' . $action);
         $request = $request->withUri($uri);
 
         // $runner = $this->container->get(ControllerRunner::class);
