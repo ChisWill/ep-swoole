@@ -9,6 +9,7 @@ use Ep\Swoole\Contract\ServerInterface;
 use Ep\Swoole\Contract\ServerTrait;
 use Swoole\Constant;
 use Swoole\Server as SwooleServer;
+use LogicException;
 
 /**
  * @method SwooleServer getServer()
@@ -37,8 +38,9 @@ final class Server implements ServerInterface
      */
     protected function bootstrap(SwooleServer $server): void
     {
-        $server->on(Constant::EVENT_RECEIVE, function (SwooleServer $server, int $fd, int $reactorId, string $data) {
-            echo "[#" . $server->worker_id . "][@{$reactorId}]\tClientFd:[$fd]\n" . $data;
-        });
+        if (!isset($this->config->events[Constant::EVENT_RECEIVE])) {
+            throw new LogicException('The "events" configuration must set ' . Constant::EVENT_RECEIVE . ' callback.');
+        }
+        $server->on(Constant::EVENT_RECEIVE, $this->config->events[Constant::EVENT_RECEIVE]);
     }
 }

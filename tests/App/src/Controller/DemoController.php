@@ -17,6 +17,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use Swoole\ConnectionPool;
 use Yiisoft\Aliases\Aliases;
+use Yiisoft\Cache\CacheInterface;
 use Yiisoft\Cookies\Cookie;
 use Yiisoft\Cookies\CookieCollection;
 use Yiisoft\Db\Cache\QueryCache;
@@ -96,10 +97,8 @@ class DemoController extends Controller
         return $this->string('over');
     }
 
-    public function cacheAction()
+    public function cacheAction(CacheInterface $cache)
     {
-        $cache = Ep::getCache();
-
         $r = $cache->getOrSet('name', fn () => mt_rand(0, 100), 5);
 
         return $this->string($r);
@@ -249,7 +248,7 @@ class DemoController extends Controller
         $view = $this->getView()->withLayout('chat');
         $this->title = 'Chat Room';
 
-        $id = $request->getQueryParams()['id'] ?? '';
+        $id = $request->getQueryParams()['id'] ?? '1';
         $host = $request->getUri()->getHost();
 
         return $this->string($view->render('chatRoom', compact('id', 'host')));
