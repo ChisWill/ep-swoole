@@ -6,4 +6,4 @@ use Ep\Web\Application;
 
 require(dirname(__DIR__, 3) . '/vendor/autoload.php');
 
-Ep::init(import('main'))->get(Application::class)->run();
+Ep::init(dirname(__DIR__))->get(Application::class)->run();

@@ -7,7 +7,7 @@ use Ep\Swoole\Application;
 
 require(dirname(__DIR__, 3) . '/vendor/autoload.php');
 
-$exitCode = Ep::init(import('main'))
+$exitCode = Ep::init(dirname(__DIR__))
     ->get(Application::class)
     ->run(import('swoole'));
 
