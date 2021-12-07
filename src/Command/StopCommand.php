@@ -33,13 +33,13 @@ final class StopCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $pidFile = $this->systemKit->getPidFile();
-        if (!file_exists($pidFile)) {
-            return self::SUCCESS;
+        $exitCode = self::SUCCESS;
+        if (!file_exists($pidFile = $this->systemKit->getPidFile())) {
+            return $exitCode;
         }
 
-        exec('kill ' . file_get_contents($pidFile));
+        passthru('kill ' . file_get_contents($pidFile), $exitCode);
 
-        return self::SUCCESS;
+        return $exitCode;
     }
 }
