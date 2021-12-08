@@ -28,17 +28,17 @@ final class Event
         }
 
         /** @var Mysql */
-        // $mysql = Ep::getDi()->get(Pool::class)->get('mysql');
-        // $mysql->open();
-        // $beforeRequest->setRequest($request
-        //     ->withAttribute(
-        //         'sqlite',
-        //         $this->createSqlite()
-        //     )
-        //     ->withAttribute(
-        //         'mysql',
-        //         $mysql
-        //     ));
+        $mysql = Ep::getDi()->get(Pool::class)->get('mysql');
+        $mysql->open();
+        $beforeRequest->setRequest($request
+            ->withAttribute(
+                'sqlite',
+                $this->createSqlite()
+            )
+            ->withAttribute(
+                'mysql',
+                $mysql
+            ));
     }
 
     public function after(AfterRequest $afterRequest)
@@ -48,9 +48,9 @@ final class Event
             return;
         }
         /** @var Mysql */
-        // $mysql = $request->getAttribute('mysql');
-        // $mysql->close();
-        // Ep::getDi()->get(Pool::class)->put('mysql', $mysql);
+        $mysql = $request->getAttribute('mysql');
+        $mysql->close();
+        Ep::getDi()->get(Pool::class)->put('mysql', $mysql);
     }
 
     private function createSqlite(): Sqlite

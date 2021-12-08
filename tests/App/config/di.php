@@ -42,7 +42,7 @@ return static fn (Config $config): array => [
                 'mysql' => Reference::to(Connection::class)
             ],
             [
-                'mysql' => 50
+                'mysql' => 1
             ]
         ],
     ],
