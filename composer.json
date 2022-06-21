@@ -6,16 +6,16 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
-        "php": ">=7.4",
+        "php": "^8.0",
         "ext-swoole": "^4.6",
-        "chiswill/ep": "dev-master"
+        "chiswill/ep2": "dev-master"
     },
     "require-dev": {
         "swoole/ide-helper": "^4.6",
         "yiisoft/db-mysql": "dev-master",
         "yiisoft/db-redis": "dev-master",
         "yiisoft/db-sqlite": "dev-master",
-        "yiisoft/log-target-file": "dev-master"
+        "yiisoft/log-target-file": "^1.0"
     },
     "suggest": {
         "yiisoft/db-redis": "Allows websocket server working with multiple process"
